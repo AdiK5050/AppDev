@@ -74,7 +74,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
                     Column {
-                        CreateDestination()
+                        val destinations = Destinations()
+                        destinations.CreateDestination()
                     }
                 }
             }

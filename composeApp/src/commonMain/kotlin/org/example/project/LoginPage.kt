@@ -2,7 +2,6 @@ package org.example.project
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,31 +17,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
+import org.example.project.viewmodels.Database
+import org.example.project.viewmodels.LoginViewModel
 
 @Serializable
 object Login
 
 
 @Composable
-fun Login(appViewModel: AppViewModel,onNavigateToMessages: () -> Unit, onNavigateToSignup: () -> Unit) {
+fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginViewModel(database = database) }, onNavigateToMessages: () -> Unit, onNavigateToSignup: () -> Unit) {
 
-    val appUiState: AppUiState by appViewModel.uiState.collectAsState()
-    var loginFailed by remember { mutableStateOf(false)}
+    var loginFailed by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -59,26 +54,28 @@ fun Login(appViewModel: AppViewModel,onNavigateToMessages: () -> Unit, onNavigat
 
         Spacer(Modifier.size(10.dp))
         LogInLayout(
-            name = appViewModel.name,
-            password = appViewModel.password,
-            onKeyboardDone = {
-                appViewModel.checkUserInfo()
-                loginFailed = !appUiState.logInSuccessful},
-            onUserNameChanged = {
-                appViewModel.updateUserName(it)
-                loginFailed = false },
-            onUserPasswordChanged = {
-                appViewModel.updatePassword(it)
-                loginFailed = false},
+            name = loginViewModel.name,
+            password = loginViewModel.password,
+            onKeyboardDone =
+                { loginViewModel.login()
+                     if (!loginViewModel.isError) {
+                         onNavigateToMessages()
+                     }else {
+                         loginFailed = true
+                     }},
+            onUserNameChanged = { loginViewModel.name = it },
+            onUserPasswordChanged = { loginViewModel.password = it },
         )
         Button(onClick = {
-            appViewModel.checkUserInfo()
-            loginFailed = !appUiState.logInSuccessful
+            loginViewModel.login()
+            if (!loginViewModel.isError) {
+                onNavigateToMessages()
+            }else {
+                loginFailed = true
+            }
         }) {
             Text("Log-In")
-            if(appUiState.logInSuccessful) {
-                onNavigateToMessages()
-            }
+
         }
         Spacer(Modifier.size(5.dp))
         AnimatedVisibility(loginFailed) {
@@ -111,15 +108,7 @@ fun LogInLayout(
         readOnly = false,
         modifier = Modifier
             .padding()
-            .background(color = MaterialTheme.colorScheme.surface)
-            .onKeyEvent { event ->
-                if (event.type == KeyEventType.KeyDown && event.key == Key.Enter) {
-                    onKeyboardDone()
-                    true }
-                else {
-                    false
-                }
-            },
+            .background(color = MaterialTheme.colorScheme.surface),
         keyboardOptions =  KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
@@ -134,15 +123,7 @@ fun LogInLayout(
         readOnly = false,
         modifier = Modifier
             .padding()
-            .background(color = MaterialTheme.colorScheme.surface)
-            .onKeyEvent { event ->
-                if (event.type == KeyEventType.KeyDown && event.key == Key.Enter) {
-                    onKeyboardDone()
-                    true }
-                else {
-                    false
-                }
-            },
+            .background(color = MaterialTheme.colorScheme.surface),
         keyboardOptions =  KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),

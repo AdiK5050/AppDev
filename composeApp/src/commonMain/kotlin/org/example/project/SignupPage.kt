@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
+import org.example.project.viewmodels.Database
 import org.example.project.viewmodels.SignupViewModel
 
 data class UserInfo(val name: String, val password: String)
@@ -36,7 +37,7 @@ data class UserInfo(val name: String, val password: String)
 object SignUp
 
 @Composable
-fun SignUp(signupViewModel: SignupViewModel = viewModel { SignupViewModel() }, onNavigateToLogin: () -> Unit) {
+fun SignUp(database: Database, signupViewModel: SignupViewModel = viewModel { SignupViewModel(database = database) }, onNavigateToLogin: () -> Unit) {
     var signupFailed by remember { mutableStateOf(false)}
 
     Column(
@@ -58,18 +59,24 @@ fun SignUp(signupViewModel: SignupViewModel = viewModel { SignupViewModel() }, o
         SignUpLayout(
             name = signupViewModel.name,
             password = signupViewModel.password,
-            onKeyboardDone = {},
-            onUserNameChanged = {
-                signupViewModel.name = it
-            },
-            onUserPasswordChanged = {
-                signupViewModel.password = it
-            },
+            onKeyboardDone = {
+                signupViewModel.signup()
+                if (!signupViewModel.isError) {
+                    onNavigateToLogin()
+                }else {
+                    signupFailed = true
+                }},
+            onUserNameChanged = { signupViewModel.name = it },
+            onUserPasswordChanged = { signupViewModel.password = it },
         )
 
         Button(onClick = {
             signupViewModel.signup()
-            onNavigateToLogin()
+            if (!signupViewModel.isError) {
+                onNavigateToLogin()
+            }else {
+                signupFailed = true
+            }
         }) {
             Text("Sign-Up")
         }

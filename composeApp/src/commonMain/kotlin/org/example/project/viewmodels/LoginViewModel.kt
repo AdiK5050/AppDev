@@ -5,31 +5,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
-class SignupViewModel(val database: Database) : ViewModel() {
+class LoginViewModel(val database: Database) : ViewModel() {
+
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
 
-
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
-
     fun resetInput() {
         name = ""
         password = ""
     }
-    fun signup() : Boolean {
+
+    fun login() : Boolean {
         isError = false
         errorMessage = ""
-
-        if(name.trim().isNotEmpty() && password.trim().isNotEmpty()) {
-           database.addUser(User(name, password)) // TODO: before adding user, check if they already exist!
-            resetInput()
-            return true
-        } else {
-            resetInput()
-            isError = true
-            errorMessage = "Sign up failed"
+        for(user in database.users) {
+            if (user.name == name && user.password == password) {
+                resetInput()
+                return true
+            }
         }
+        resetInput()
+        isError = true
+        errorMessage = "Log in failed"
         return false
     }
 }

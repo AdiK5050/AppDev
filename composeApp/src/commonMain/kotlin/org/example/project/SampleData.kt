@@ -74,9 +74,4 @@ object SampleData {
             "Have you tried writing build.gradle with KTS?"
         ),
     ).toMutableList()
-
-    val userInfoSample = listOf(
-        UserInfo("Rias","12345"),
-        UserInfo("Aditya","12345")
-    ).toMutableList()
 }

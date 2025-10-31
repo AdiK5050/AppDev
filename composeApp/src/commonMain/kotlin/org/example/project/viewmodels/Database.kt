@@ -8,8 +8,4 @@ class Database {
     fun addUser(user: User) {
         users.add(user)
     }
-
-    fun checkPassword(providedName: String, providedPassword: String) : Boolean {
-        return users.any { (name, password) -> name == providedName && password == providedPassword }
-    }
 }
