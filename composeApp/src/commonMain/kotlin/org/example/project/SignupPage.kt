@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
+import org.example.project.viewmodels.SignupViewModel
 
 data class UserInfo(val name: String, val password: String)
 
@@ -34,10 +36,9 @@ data class UserInfo(val name: String, val password: String)
 object SignUp
 
 @Composable
-fun SignUp(appViewModel: AppViewModel, onNavigateToLogin: () -> Unit) {
-    val appUiState by appViewModel.uiState.collectAsState()
-
+fun SignUp(signupViewModel: SignupViewModel = viewModel { SignupViewModel() }, onNavigateToLogin: () -> Unit) {
     var signupFailed by remember { mutableStateOf(false)}
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,21 +56,22 @@ fun SignUp(appViewModel: AppViewModel, onNavigateToLogin: () -> Unit) {
         Spacer(Modifier.size(10.dp))
 
         SignUpLayout(
-            name = appViewModel.name,
-            password = appViewModel.password,
-            onKeyboardDone = { appViewModel.addUserInfo() },
-            onUserNameChanged = { appViewModel.updateUserName(it)},
-            onUserPasswordChanged = { appViewModel.updatePassword(it)},
+            name = signupViewModel.name,
+            password = signupViewModel.password,
+            onKeyboardDone = {},
+            onUserNameChanged = {
+                signupViewModel.name = it
+            },
+            onUserPasswordChanged = {
+                signupViewModel.password = it
+            },
         )
 
         Button(onClick = {
-            appViewModel.addUserInfo()
-            signupFailed = !appUiState.signUpSuccessful
+            signupViewModel.signup()
+            onNavigateToLogin()
         }) {
             Text("Sign-Up")
-            if(appUiState.signUpSuccessful) {
-                onNavigateToLogin()
-            }
         }
 
         AnimatedVisibility(signupFailed) {

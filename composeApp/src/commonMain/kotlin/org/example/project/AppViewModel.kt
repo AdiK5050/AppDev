@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class AppViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(AppUiState())
-    val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
-    //var userInfoList: MutableList<UserInfo> = mutableListOf()
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
 
@@ -23,29 +20,16 @@ class AppViewModel : ViewModel() {
         this.password = password
     }
     fun checkUserInfo()  {
-        for (user in uiState.value.userInfoList) {
-            if (user.name.equals(name.trim()) && user.password.equals(password.trim())){
-                _uiState.update { currentState ->
-                    currentState.copy(logInSuccessful = true)
-                }
-            }
-        updateUserName("")
-        updatePassword("")
+        if(name.equals("Adi") && password.equals("password")) {
+            // Auth OK
+        } else {
+            // Auth not OK
         }
     }
+
     fun addUserInfo() {
-        if(name.trim().isNotEmpty() || password.trim().isNotEmpty()) {
-            _uiState.update { currentState ->
-                currentState.copy(signUpSuccessful = true)
-            }
-        }
-        updateUserName("")
-        updatePassword("")
-    }
-    fun start() {
-        _uiState.value = AppUiState()
-    }
-    init{
-        start()
+
+
+
     }
 }

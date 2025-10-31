@@ -12,7 +12,6 @@ import androidx.navigation.toRoute
 @Composable
 fun CreateDestination() {
     val appViewModel : AppViewModel = AppViewModel()
-    val appUiState: State<AppUiState> = appViewModel.uiState.collectAsState()
     val navController = rememberNavController()
     NavHost(
         modifier = Modifier.then(Modifier),
@@ -26,7 +25,6 @@ fun CreateDestination() {
                     navController.navigate(
                         route = Text
                     )
-                    appViewModel.start()
                 },
                 onNavigateToSignup = {
                     navController.navigate(
@@ -61,9 +59,7 @@ fun CreateDestination() {
                 navController.navigate(
                     route = Login
                     )
-                    appViewModel.start()
                 },
-                appViewModel = appViewModel
             )
         }
     }
