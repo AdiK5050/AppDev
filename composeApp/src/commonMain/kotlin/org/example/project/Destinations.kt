@@ -36,7 +36,7 @@ class Destinations  {
             }
             composable<Text> { backStackEntry ->
                 val texting: Text = backStackEntry.toRoute()
-                Texting(SampleData.conversationSample, onNavigateToProfile = {
+                Messages(SampleData.conversationSample, onNavigateToProfile = {
                     navController.navigate(
                         route = UserProfile(name = "Rias")
                     )

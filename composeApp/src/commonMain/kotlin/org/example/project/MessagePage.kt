@@ -86,7 +86,7 @@ fun MessageCard(msg : Message, onNavigateToProfile: () -> Unit) {
 }
 
 @Composable
-fun Texting(messages: List<Message>, onNavigateToProfile: () -> Unit){
+fun Messages(messages: List<Message>, onNavigateToProfile: () -> Unit){
     var buttonPressed by remember { mutableStateOf(false) }
     var value by remember{ mutableStateOf("")}
 

@@ -41,7 +41,7 @@ fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginV
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(50.dp)
+            .padding(30.dp)
             .imePadding(),
         Arrangement.Center,
         Alignment.CenterHorizontally
@@ -61,17 +61,27 @@ fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginV
                      if (!loginViewModel.isError) {
                          onNavigateToMessages()
                      }else {
-                         loginFailed = true
+                         loginFailed = loginViewModel.isError
                      }},
-            onUserNameChanged = { loginViewModel.name = it },
-            onUserPasswordChanged = { loginViewModel.password = it },
+            onUserNameChanged = {
+                loginViewModel.name = it
+                loginViewModel.errorMessage = ""
+                loginViewModel.isError = false
+                loginFailed = loginViewModel.isError
+                },
+            onUserPasswordChanged = {
+                loginViewModel.password = it
+                loginViewModel.errorMessage = ""
+                loginViewModel.isError = false
+                loginFailed = loginViewModel.isError
+                },
         )
         Button(onClick = {
             loginViewModel.login()
             if (!loginViewModel.isError) {
                 onNavigateToMessages()
             }else {
-                loginFailed = true
+                loginFailed = loginViewModel.isError
             }
         }) {
             Text("Log-In")
@@ -79,12 +89,20 @@ fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginV
         }
         Spacer(Modifier.size(5.dp))
         AnimatedVisibility(loginFailed) {
-            Text(
-                text = "Log-In Failed",
-                color = MaterialTheme.colorScheme.error
-            )
+            Column {
+                Text(
+                    text = "Log-In Failed",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text =  loginViewModel.errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
-        Spacer(Modifier.size(10.dp))
+        Spacer(Modifier.size(2.dp))
 
         Text("Don't have an account?")
         Button(onClick =  onNavigateToSignup ){

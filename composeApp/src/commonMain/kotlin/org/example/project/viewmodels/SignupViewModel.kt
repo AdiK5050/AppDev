@@ -13,6 +13,8 @@ class SignupViewModel(val database: Database) : ViewModel() {
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
 
+
+
     fun resetInput() {
         name = ""
         password = ""
@@ -21,14 +23,51 @@ class SignupViewModel(val database: Database) : ViewModel() {
         isError = false
         errorMessage = ""
 
-        if(name.trim().isNotEmpty() && password.trim().isNotEmpty()) {
-           database.addUser(User(name, password)) // TODO: before adding user, check if they already exist!
+         if(!isBlankField()
+             && !userExist()
+             && !weakPassword()
+             ){
+           database.addUser(User(name, password)) // TODO: before adding user, check if they already exist! Update:- Checks Done
             resetInput()
             return true
         } else {
             resetInput()
             isError = true
-            errorMessage = "Sign up failed"
+        }
+        return false
+    }
+    fun userExist(): Boolean {
+        for (user in database.users) {
+            if (user.name == name) {
+                errorMessage = "Username already exists"
+                return true
+            }
+        }
+        return false
+    }
+    fun isBlankField(): Boolean {
+        if(name.trim().isEmpty() || password.trim().isEmpty()) {
+            isError = true
+            errorMessage = "Empty Username or Password"
+            return true
+        }
+        return false
+    }
+
+    fun weakPassword(): Boolean {
+        val passwordChars = password.toCharArray().toList()
+        val hasUpperCase = passwordChars.any { it.isUpperCase() }
+        val hasLowerCase = passwordChars.any { it.isLowerCase() }
+        val hasDigit = passwordChars.any { it.isDigit() }
+
+        if(
+            !hasUpperCase
+            || !hasLowerCase
+            || !hasDigit
+            || password.length < 8) {
+            errorMessage =
+                "Weak Password! It must contain a capital letter, a small letter, a number and be at least 8 characters long"
+            return true
         }
         return false
     }

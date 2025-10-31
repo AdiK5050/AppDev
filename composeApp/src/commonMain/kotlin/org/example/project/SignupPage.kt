@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +30,6 @@ import kotlinx.serialization.Serializable
 import org.example.project.viewmodels.Database
 import org.example.project.viewmodels.SignupViewModel
 
-data class UserInfo(val name: String, val password: String)
 
 @Serializable
 object SignUp
@@ -43,7 +41,7 @@ fun SignUp(database: Database, signupViewModel: SignupViewModel = viewModel { Si
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(50.dp)
+            .padding(30.dp)
             .imePadding(),
         Arrangement.Center,
         Alignment.CenterHorizontally
@@ -64,10 +62,20 @@ fun SignUp(database: Database, signupViewModel: SignupViewModel = viewModel { Si
                 if (!signupViewModel.isError) {
                     onNavigateToLogin()
                 }else {
-                    signupFailed = true
+                    signupFailed = signupViewModel.isError
                 }},
-            onUserNameChanged = { signupViewModel.name = it },
-            onUserPasswordChanged = { signupViewModel.password = it },
+            onUserNameChanged = {
+                signupViewModel.name = it
+                signupViewModel.errorMessage = ""
+                signupViewModel.isError = false
+                signupFailed = signupViewModel.isError
+                },
+            onUserPasswordChanged = {
+                signupViewModel.password = it
+                signupViewModel.errorMessage = ""
+                signupViewModel.isError = false
+                signupFailed = signupViewModel.isError
+                },
         )
 
         Button(onClick = {
@@ -75,19 +83,27 @@ fun SignUp(database: Database, signupViewModel: SignupViewModel = viewModel { Si
             if (!signupViewModel.isError) {
                 onNavigateToLogin()
             }else {
-                signupFailed = true
+                signupFailed = signupViewModel.isError
             }
         }) {
             Text("Sign-Up")
         }
 
         AnimatedVisibility(signupFailed) {
-            Text(
-                text = "Sign-Up Failed",
-                color = MaterialTheme.colorScheme.error
-            )
+            Column {
+                Text(
+                    text = "Sign-Up Failed",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text = signupViewModel.errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
-        Spacer(Modifier.size(10.dp))
+        Spacer(Modifier.size(2.dp))
 
         Text("Already have an account?")
         Button(onClick = onNavigateToLogin) {

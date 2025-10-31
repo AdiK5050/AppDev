@@ -20,15 +20,40 @@ class LoginViewModel(val database: Database) : ViewModel() {
     fun login() : Boolean {
         isError = false
         errorMessage = ""
+        if (!isBlankField() && userFound() && correctPassword()) {
+            resetInput()
+            return true
+        }
+
+        resetInput()
+        isError = true
+        return false
+    }
+    fun userFound() :Boolean{
         for(user in database.users) {
-            if (user.name == name && user.password == password) {
-                resetInput()
+            if (user.name == name) {
                 return true
             }
         }
-        resetInput()
-        isError = true
-        errorMessage = "Log in failed"
+        errorMessage = "User not found"
+        return false
+    }
+
+    fun correctPassword(): Boolean {
+        for (user in database.users) {
+            if (user.name == name && user.password == password) {
+                return true
+            }
+        }
+        errorMessage = "Incorrect Password"
+        return false
+    }
+    fun isBlankField(): Boolean {
+        if(name.trim().isEmpty() || password.trim().isEmpty()) {
+            isError = true
+            errorMessage = "Empty Username or Password"
+            return true
+        }
         return false
     }
 }
