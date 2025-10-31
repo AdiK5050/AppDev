@@ -1,7 +1,5 @@
 package org.example.project
 
-import androidx.compose.runtime.mutableStateOf
-
 /**
  * SampleData for Jetpack Compose Tutorial 
  */
