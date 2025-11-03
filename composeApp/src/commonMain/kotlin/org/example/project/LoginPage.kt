@@ -36,8 +36,8 @@ object Login
 
 @Composable
 fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginViewModel(database = database) }, onNavigateToMessages: () -> Unit, onNavigateToSignup: () -> Unit) {
-
     var loginFailed by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +85,6 @@ fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginV
             }
         }) {
             Text("Log-In")
-
         }
         Spacer(Modifier.size(5.dp))
         AnimatedVisibility(loginFailed) {

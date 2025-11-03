@@ -1,6 +1,9 @@
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+
+
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -41,9 +44,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.peekaboo.image.picker)
             implementation("androidx.navigation:navigation-compose:2.9.5")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
         }

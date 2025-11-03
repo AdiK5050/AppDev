@@ -2,16 +2,22 @@ package org.example.project
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinproject.composeapp.generated.resources.Res
+import kotlinproject.composeapp.generated.resources.riasgremory
 import org.example.project.viewmodels.Database
+import org.jetbrains.compose.resources.imageResource
 
 class Destinations  {
     val database = Database()
     @Composable
     fun CreateDestination() {
+        var profilePic: ImageBitmap = imageResource(Res.drawable.riasgremory)
+        database.setProfilePic(profilePic)
         val navController = rememberNavController()
         NavHost(
             modifier = Modifier.then(Modifier),
@@ -35,8 +41,7 @@ class Destinations  {
                 )
             }
             composable<Text> { backStackEntry ->
-                val texting: Text = backStackEntry.toRoute()
-                Messages(SampleData.conversationSample, onNavigateToProfile = {
+                Messages(SampleData.conversationSample, database, onNavigateToProfile = {
                     navController.navigate(
                         route = UserProfile(name = "Rias")
                     )
@@ -46,6 +51,7 @@ class Destinations  {
                 val profile: UserProfile = backStackEntry.toRoute()
                 ProfileScreen(
                     name = profile.name,
+                    database,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = Text
@@ -53,7 +59,6 @@ class Destinations  {
                     })
             }
             composable<SignUp> { backStackEntry ->
-                val signup: SignUp = backStackEntry.toRoute()
                 SignUp(
                     database = database,
                     onNavigateToLogin = {

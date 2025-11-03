@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -35,6 +36,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.riasgremory
 import kotlinx.serialization.Serializable
+import org.example.project.viewmodels.Database
+import org.jetbrains.compose.resources.imageResource
 
 
 data class Message(val author: String, val body: String)
@@ -43,12 +46,13 @@ data class Message(val author: String, val body: String)
 object Text
 
 @Composable
-fun MessageCard(msg : Message, onNavigateToProfile: () -> Unit) {
+fun MessageCard(msg : Message, database: Database, onNavigateToProfile: () -> Unit) {
+
     Row(
         modifier = Modifier.padding(all = 8.dp)
     ){
         Image(
-            painter = painterResource(Res.drawable.riasgremory),
+            bitmap = database.getProfilePic(),
             contentDescription = "A photo of a beauty.",
             modifier = Modifier
                 .size(40.dp)
@@ -86,7 +90,7 @@ fun MessageCard(msg : Message, onNavigateToProfile: () -> Unit) {
 }
 
 @Composable
-fun Messages(messages: List<Message>, onNavigateToProfile: () -> Unit){
+fun Messages(messages: List<Message>, database: Database, onNavigateToProfile: () -> Unit){
     var buttonPressed by remember { mutableStateOf(false) }
     var value by remember{ mutableStateOf("")}
 
@@ -97,7 +101,7 @@ fun Messages(messages: List<Message>, onNavigateToProfile: () -> Unit){
         ) {
             if(buttonPressed) addMessage(value) else null
             items(messages) { message ->
-                MessageCard(message, onNavigateToProfile)
+                MessageCard(message, database,onNavigateToProfile)
             }
         }
         val label = "Enter a message"
