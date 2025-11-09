@@ -1,16 +1,17 @@
-package org.example.project
+package org.example.project.Junk
 
 /**
  * SampleData for Jetpack Compose Tutorial 
  */
+data class OldMessages(val author: String, val body: String)
 object SampleData {
     // Sample conversation data
     val conversationSample = listOf(
-        Message(
+        OldMessages(
             "Rias",
             "Test...Test...Test..."
         ),
-        Message(
+        OldMessages(
             "Rias",
             """List of Android versions:
             |Android KitKat (API 19)
@@ -23,51 +24,51 @@ object SampleData {
             |Android 11 (API 30)
             |Android 12 (API 31)""".trim()
         ),
-        Message(
+        OldMessages(
             "Rias",
             """I think Kotlin is my favorite programming language.
             |It's so much fun!""".trim()
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Searching for alternatives to XML layouts..."
         ),
-        Message(
+        OldMessages(
             "Rias",
             """Hey, take a look at Jetpack Compose, it's great!
             |It's the Android's modern toolkit for building native UI.
             |It simplifies and accelerates UI development on Android.
             |Less code, powerful tools, and intuitive Kotlin APIs :)""".trim()
         ),
-        Message(
+        OldMessages(
             "Rias",
             "It's available from API 21+ :)"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Writing Kotlin for UI seems so natural, Compose where have you been all my life?"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Android Studio next version's name is Arctic Fox"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Android Studio Arctic Fox tooling for Compose is top notch ^_^"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "I didn't know you can now run the emulator directly from Android Studio"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Compose Previews are great to check quickly how a composable layout looks like"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Previews are also interactive after enabling the experimental setting"
         ),
-        Message(
+        OldMessages(
             "Rias",
             "Have you tried writing build.gradle with KTS?"
         ),

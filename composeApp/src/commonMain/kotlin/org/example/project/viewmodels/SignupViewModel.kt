@@ -25,11 +25,11 @@ class SignupViewModel(val database: Database) : ViewModel() {
 
          if(!isBlankField()
              && !userExist()
-             && !weakPassword()
-             ){
-           database.addUser(User(name, password)) // TODO: before adding user, check if they already exist! Update:- Checks Done
-            resetInput()
-            return true
+             && !weakPassword()){
+                database.addUser(User(name, password))
+                resetInput()
+                //storeUserdata.putUserLoginInfo(name, password)
+                return true
         } else {
             resetInput()
             isError = true

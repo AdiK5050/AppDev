@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Adi-X-Rias</string>
+    <string name="datastore_file_path">C:\Users\kumra\Downloads\KotlinProject\KotlinProject\composeApp\src\commonMain\composeResources</string>
 </resources>

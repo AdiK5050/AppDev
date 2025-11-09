@@ -1,6 +1,10 @@
 package org.example.project
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.navigation.compose.NavHost
@@ -12,40 +16,56 @@ import kotlinproject.composeapp.generated.resources.riasgremory
 import org.example.project.viewmodels.Database
 import org.jetbrains.compose.resources.imageResource
 
-class Destinations  {
+class Destinations()  {
+
     val database = Database()
+
     @Composable
     fun CreateDestination() {
-        var profilePic: ImageBitmap = imageResource(Res.drawable.riasgremory)
+
+        val profilePic: ImageBitmap = imageResource(Res.drawable.riasgremory)
+        var startDestination: Any by remember {mutableStateOf(database.getStartDestination())}
+
         database.setProfilePic(profilePic)
+        database.initUserLoginInfo()
+        database.initMessageHistory()
+
         val navController = rememberNavController()
         NavHost(
             modifier = Modifier.then(Modifier),
             navController = navController,
-            startDestination = Login
+            startDestination = startDestination
         )
         {
-            composable<Login> { backStackEntry ->
-                Login(
+            composable<NewLogin> { backStackEntry ->
+                NewLogin(
                     database = database,
                     onNavigateToMessages = {
                         navController.navigate(
-                            route = Text
+                            route = MessagePage
                         )
                     },
                     onNavigateToSignup = {
                         navController.navigate(
-                            route = SignUp
+                            route = NewSignup
                         )
-                    },
+                    }
                 )
             }
-            composable<Text> { backStackEntry ->
-                Messages(SampleData.conversationSample, database, onNavigateToProfile = {
+            composable<MessagePage> { backStackEntry ->
+                NewMessagePage(
+                    database,
+                    onNavigateToProfile = {
                     navController.navigate(
                         route = UserProfile(name = "Rias")
                     )
-                })
+                },
+                    onNavigateToLogin = {
+                        navController.navigate(
+                            route = NewLogin
+                        )
+                    }
+                    )
             }
             composable<UserProfile> { backStackEntry ->
                 val profile: UserProfile = backStackEntry.toRoute()
@@ -54,16 +74,16 @@ class Destinations  {
                     database,
                     onNavigateToMessages = {
                         navController.navigate(
-                            route = Text
+                            route = MessagePage
                         )
                     })
             }
-            composable<SignUp> { backStackEntry ->
-                SignUp(
+            composable< NewSignup> { backStackEntry ->
+                NewSignup(
                     database = database,
                     onNavigateToLogin = {
                         navController.navigate(
-                            route = Login
+                            route = NewLogin
                         )
                     },
                 )

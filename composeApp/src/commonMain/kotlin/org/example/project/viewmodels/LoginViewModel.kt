@@ -12,6 +12,8 @@ class LoginViewModel(val database: Database) : ViewModel() {
 
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
+
+    var isLoggedIn by mutableStateOf(database.isLoggedIn())
     fun resetInput() {
         name = ""
         password = ""

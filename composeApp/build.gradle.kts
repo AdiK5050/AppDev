@@ -1,4 +1,5 @@
 
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 
@@ -14,6 +15,7 @@ plugins {
 }
 
 kotlin {
+    jvm()
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -45,9 +47,16 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.peekaboo.image.picker)
+            implementation(libs.settings)
+            implementation(libs.settings.serialization)
             implementation("androidx.navigation:navigation-compose:2.9.5")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
+            implementation("androidx.datastore:datastore:1.1.7")
+            implementation("androidx.datastore:datastore-preferences:1.1.7")
+            implementation("androidx.datastore:datastore-preferences-core:1.1.7")
+            implementation("com.russhwolf:multiplatform-settings-coroutines:1.3.0")
+        }
+        jvmMain.dependencies {
 
         }
         commonTest.dependencies {
@@ -85,5 +94,15 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+compose.desktop{
+    application {
+        mainClass = "org.example.project.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "org.example.project"
+            packageVersion = "1.0.0"
+        }
+    }
 }
 

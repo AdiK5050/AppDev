@@ -1,7 +1,6 @@
-package org.example.project
+package org.example.project.Junk
 
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,25 +26,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.riasgremory
 import kotlinx.serialization.Serializable
 import org.example.project.viewmodels.Database
-import org.jetbrains.compose.resources.imageResource
 
-
-data class Message(val author: String, val body: String)
 
 @Serializable
-object Text
+object Message
 
 @Composable
-fun MessageCard(msg : Message, database: Database, onNavigateToProfile: () -> Unit) {
+fun MessageCard(msg: OldMessages, database: Database, onNavigateToProfile: () -> Unit) {
 
     Row(
         modifier = Modifier.padding(all = 8.dp)
@@ -90,18 +80,19 @@ fun MessageCard(msg : Message, database: Database, onNavigateToProfile: () -> Un
 }
 
 @Composable
-fun Messages(messages: List<Message>, database: Database, onNavigateToProfile: () -> Unit){
+fun Messages(messages: List<OldMessages>, database: Database, onNavigateToProfile: () -> Unit, onNavigateToLogin: ()-> Unit){
     var buttonPressed by remember { mutableStateOf(false) }
     var value by remember{ mutableStateOf("")}
 
-    Surface{
+    Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
-                .height(715.dp),
+                .fillMaxWidth()
+                .padding(5.dp)
         ) {
-            if(buttonPressed) addMessage(value) else null
+            if (buttonPressed) addMessage(value) else null
             items(messages) { message ->
-                MessageCard(message, database,onNavigateToProfile)
+                MessageCard(message, database, onNavigateToProfile)
             }
         }
         val label = "Enter a message"
@@ -110,12 +101,10 @@ fun Messages(messages: List<Message>, database: Database, onNavigateToProfile: (
                 modifier = Modifier
                     .padding(10.dp),
                 shape = CircleShape,
-                onClick = (
-                        { buttonPressed = !buttonPressed })
+                onClick = ({ buttonPressed = !buttonPressed })
             ) {
                 Text("Enter")
-                //if(buttonPressed) AddMessage(value)
-                if(buttonPressed) value = ""
+                if (buttonPressed) value = ""
                 buttonPressed = false
             }
         }
@@ -130,7 +119,7 @@ fun Messages(messages: List<Message>, database: Database, onNavigateToProfile: (
                 value = value,
                 label = { Text(label) },
                 readOnly = false,
-                trailingIcon = if(value.isNotBlank()) icon else null,
+                trailingIcon = if (value.isNotBlank()) icon else null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = MaterialTheme.colorScheme.surface),
@@ -139,87 +128,6 @@ fun Messages(messages: List<Message>, database: Database, onNavigateToProfile: (
     }
 }
 fun addMessage(msg: String) {
-    val message = Message("Rias", msg)
+    val message = OldMessages("Rias", msg)
     SampleData.conversationSample.add(message)
 }
-@Composable
-fun Profile(show: Boolean) {
-    var showProfile by remember { mutableStateOf(false) }
-    showProfile = show
-    AnimatedVisibility(showProfile) {
-        NavigationBar (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(),
-        ) {
-            Column (
-                modifier = Modifier
-
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text("Hello")
-            }
-        }
-    }
-    }
-
-@Preview
-@Composable
-fun PreviewMyCard() {
-
-}
-/*
-@Composable
-@Preview
-fun App() {
-    var showContent by remember { mutableStateOf(false) }
-    Column(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .safeContentPadding()
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(onClick = {showContent = !showContent}) {
-            Text("Fuck Me")
-        }
-    }
-    AnimatedVisibility(showContent) {
-        val greeting = remember { Greeting().greet() }
-        Column (
-            modifier = Modifier
-
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text("$greeting")
-        }
-    }
-*/
-
-  /*
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
-    }*/

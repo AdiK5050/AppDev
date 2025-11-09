@@ -1,4 +1,4 @@
-package org.example.project
+package org.example.project.Junk
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -33,12 +33,11 @@ import org.example.project.viewmodels.LoginViewModel
 @Serializable
 object Login
 
-
 @Composable
 fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginViewModel(database = database) }, onNavigateToMessages: () -> Unit, onNavigateToSignup: () -> Unit) {
     var loginFailed by remember { mutableStateOf(false) }
-
     Column(
+
         modifier = Modifier
             .fillMaxSize()
             .padding(30.dp)
@@ -46,6 +45,7 @@ fun Login(database: Database,loginViewModel: LoginViewModel = viewModel { LoginV
         Arrangement.Center,
         Alignment.CenterHorizontally
     ) {
+        if(loginViewModel.isLoggedIn) onNavigateToMessages
         Box(
             modifier = Modifier
                 .padding(5.dp)
