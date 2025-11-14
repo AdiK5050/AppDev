@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.riasgremory
 import org.example.project.viewmodels.Database
@@ -57,7 +56,7 @@ class Destinations()  {
                     database,
                     onNavigateToProfile = {
                     navController.navigate(
-                        route = UserProfile(name = "Rias")
+                        route = NewProfilePage
                     )
                 },
                     onNavigateToLogin = {
@@ -65,12 +64,10 @@ class Destinations()  {
                             route = NewLogin
                         )
                     }
-                    )
+                )
             }
-            composable<UserProfile> { backStackEntry ->
-                val profile: UserProfile = backStackEntry.toRoute()
-                ProfileScreen(
-                    name = profile.name,
+            composable<NewProfilePage> { backStackEntry ->
+                NewProfilePage(
                     database,
                     onNavigateToMessages = {
                         navController.navigate(

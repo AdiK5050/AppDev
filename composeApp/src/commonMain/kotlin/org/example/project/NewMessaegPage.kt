@@ -38,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,11 +64,11 @@ fun NewMessagePage(database: Database,
         LaunchedEffect(Unit) {
             messageViewModel.initMessageHistory()
         }
-    var messageHistory = remember { messageViewModel.messageHistory }
+    var messageHistory by remember { mutableStateOf(messageViewModel.messageHistory) }
 
     Scaffold(
         modifier = Modifier
-            .background(color = Black)
+            .background(color = Color.Black)
             .fillMaxSize()
             .padding(5.dp)
             .imePadding(),
@@ -104,7 +103,7 @@ fun NewMessagePage(database: Database,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Black,
+                    containerColor = Color.Black,
                     titleContentColor = Color.White
                 )
             )

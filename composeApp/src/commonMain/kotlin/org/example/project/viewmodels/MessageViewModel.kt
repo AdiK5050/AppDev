@@ -19,4 +19,7 @@ class MessageViewModel(val database: Database) : ViewModel() {
         val message = Message("Aditya", message,null, "receiver")
         messageHistory.add(message)
     }
+//    fun changeProfilePic(profilePic: ImageBitmap){
+//        messageHistory.forEach { message -> message.profilePic = profilePic }
+//    }
 }
