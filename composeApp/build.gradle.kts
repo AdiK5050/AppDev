@@ -36,6 +36,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("com.wannaverse:imageselector-android:")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -46,9 +47,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.peekaboo.image.picker)
             implementation(libs.settings)
             implementation(libs.settings.serialization)
+            implementation("com.wannaverse:imageselector:1.1.0")
             implementation("androidx.navigation:navigation-compose:2.9.5")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
             implementation("androidx.datastore:datastore:1.1.7")
@@ -57,7 +58,7 @@ kotlin {
             implementation("com.russhwolf:multiplatform-settings-coroutines:1.3.0")
         }
         jvmMain.dependencies {
-
+            implementation("com.wannaverse:imageselector-jvm:")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

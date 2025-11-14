@@ -2,6 +2,7 @@ package org.example.project.viewmodels
 
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.serialization.Serializable
 import org.example.project.MessagePage
@@ -18,7 +19,7 @@ class Database() {
     val users = mutableListOf<User>()
     val messageHistory = mutableStateListOf<Message>()
 
-    var profilePicInDB = ImageBitmap(1,1)
+    var profilePicInDB = mutableStateOf(ImageBitmap(1,1))
     private val settings = AppSetting.settings
 
     companion object {
@@ -69,11 +70,12 @@ class Database() {
         }
     }
     fun setProfilePic(image: ImageBitmap) {
-        profilePicInDB = image
+        profilePicInDB.value = image
+        messageHistory.forEach { message -> message.profilePic = profilePicInDB.value }
     }
 
     fun getProfilePic(): ImageBitmap {
-        return profilePicInDB
+        return profilePicInDB.value
     }
 
     fun addUser(user: User) {

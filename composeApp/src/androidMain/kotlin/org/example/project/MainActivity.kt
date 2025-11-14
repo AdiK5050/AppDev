@@ -16,6 +16,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.wannaverse.imageselector.registerImageSelectorLauncher
+import com.wannaverse.imageselector.setImageSelectorActivity
 
 
 class MainActivity : ComponentActivity() {
@@ -23,12 +25,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //wannaverse image selector instance creation
+        setImageSelectorActivity(this)
+        registerImageSelectorLauncher()
+
+        //requesting app permissions
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
-        ) {
-        }
+        ) {}
         requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
         requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+
+
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(),
