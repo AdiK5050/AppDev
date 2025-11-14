@@ -5,9 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.serialization.Serializable
-import org.example.project.MessagePage
-import org.example.project.NewLogin
-import org.example.project.Junk.SampleData
+import org.example.project.pages.NewLogin
+import org.example.project.junk.SampleData
+import org.example.project.pages.MessagePage
+
 @Serializable
 data class User(val name: String, val password: String)
 

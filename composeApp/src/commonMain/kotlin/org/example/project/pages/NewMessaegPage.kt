@@ -1,4 +1,4 @@
-package org.example.project
+package org.example.project.pages
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize

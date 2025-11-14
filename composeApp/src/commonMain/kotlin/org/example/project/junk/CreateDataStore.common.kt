@@ -1,4 +1,4 @@
-package org.example.project.Junk
+package org.example.project.junk
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory

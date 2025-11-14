@@ -1,4 +1,4 @@
-package org.example.project.Junk
+package org.example.project.junk
 
 
 import androidx.compose.animation.animateColorAsState

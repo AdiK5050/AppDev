@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wannaverse.imageselector.ImageData
 import com.wannaverse.imageselector.selectImage
+import com.wannaverse.imageselector.toByteArray
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.example.project.toByteArray
 
 class ProfilePageViewModel(val database: Database) : ViewModel() {
     var imageBitmap = mutableStateOf<ImageBitmap?>(database.profilePicInDB.value)

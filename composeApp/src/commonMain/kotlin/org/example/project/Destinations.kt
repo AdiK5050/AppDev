@@ -12,6 +12,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.riasgremory
+import org.example.project.pages.MessagePage
+import org.example.project.pages.NewLogin
+import org.example.project.pages.NewMessagePage
+import org.example.project.pages.NewProfilePage
+import org.example.project.pages.NewSignup
 import org.example.project.viewmodels.Database
 import org.jetbrains.compose.resources.imageResource
 
@@ -75,7 +80,7 @@ class Destinations()  {
                         )
                     })
             }
-            composable< NewSignup> { backStackEntry ->
+            composable<NewSignup> { backStackEntry ->
                 NewSignup(
                     database = database,
                     onNavigateToLogin = {
