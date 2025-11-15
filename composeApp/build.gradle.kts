@@ -22,15 +22,15 @@ kotlin {
         }
     }
     
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
+//    listOf(
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "ComposeApp"
+//            isStatic = true
+//        }
+//    }
     
     sourceSets {
         androidMain.dependencies {
@@ -49,16 +49,17 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.settings)
             implementation(libs.settings.serialization)
-            implementation("com.wannaverse:imageselector:1.1.0")
-            implementation("androidx.navigation:navigation-compose:2.9.5")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-            implementation("androidx.datastore:datastore:1.1.7")
-            implementation("androidx.datastore:datastore-preferences:1.1.7")
-            implementation("androidx.datastore:datastore-preferences-core:1.1.7")
-            implementation("com.russhwolf:multiplatform-settings-coroutines:1.3.0")
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.imageselector)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.androidx.datastore.preferences.core)
+            implementation(libs.settings.coroutines)
         }
         jvmMain.dependencies {
             implementation("com.wannaverse:imageselector-jvm:")
+            implementation(compose.desktop.currentOs)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

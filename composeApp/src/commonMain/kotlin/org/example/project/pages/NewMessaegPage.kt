@@ -39,6 +39,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinproject.composeapp.generated.resources.Res
@@ -64,7 +72,7 @@ fun NewMessagePage(database: Database,
         LaunchedEffect(Unit) {
             messageViewModel.initMessageHistory()
         }
-    var messageHistory by remember { mutableStateOf(messageViewModel.messageHistory) }
+        val messageHistory = remember { messageViewModel.messageHistory }
 
     Scaffold(
         modifier = Modifier
@@ -108,11 +116,11 @@ fun NewMessagePage(database: Database,
                 )
             )
         },
-        content = {
+        content = { padding -> {Modifier.padding(5.dp)}
             MessageContent(
                 messageViewModel,
                 onNavigateToProfile,
-                messageHistory
+                messageHistory,
             )
         }
     )
@@ -122,10 +130,9 @@ fun NewMessagePage(database: Database,
 fun MessageContent(
     messageViewModel: MessageViewModel,
     onNavigateToProfile: () -> Unit,
-
-    messageHistory: List<Message>
+    messageHistory: List<Message>,
 ) {
-    var value by remember { mutableStateOf("") }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
     var buttonPressed by remember { mutableStateOf(false) }
     val enterIcon = @Composable {
         Button(
@@ -135,13 +142,13 @@ fun MessageContent(
             onClick = (
                     {
                         buttonPressed = !buttonPressed
-                        if (buttonPressed) messageViewModel.addMessage(value) else null
+                        if (buttonPressed) messageViewModel.addMessage(textFieldValue.text) else null
                     }
                     )
         ) {
             Text("Enter")
             if (buttonPressed) {
-                value = ""
+                textFieldValue = TextFieldValue("")
             } else null
             buttonPressed = false
         }
@@ -158,13 +165,36 @@ fun MessageContent(
             }
         }
         OutlinedTextField(
-            onValueChange = { value = it },
-            value = value,
+            value = textFieldValue,
+            onValueChange = { newvalue -> textFieldValue = newvalue },
             label = { Text("Enter a message") },
             readOnly = false,
-            trailingIcon = if (value.isNotBlank()) enterIcon else null,
+            trailingIcon = if (textFieldValue.text.isNotBlank()) enterIcon else null,
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .onPreviewKeyEvent {
+                    if (it.key == Key.Enter && it.isShiftPressed && it.type == KeyEventType.KeyDown) {
+                        val currentText = textFieldValue.text
+                        val cursorPosition = textFieldValue.selection.start
+                        val newText =
+                            currentText.substring(0, cursorPosition) + "\n" + currentText.substring(
+                                cursorPosition
+                            )
+                        textFieldValue = TextFieldValue(
+                            text = newText,
+                            selection = TextRange(cursorPosition + 1)
+                        )
+                        true // Consume the event
+                    }
+                    else if(it.type == KeyEventType.KeyDown && it.key == Key.Enter && textFieldValue.text.isNotBlank()) {
+                        messageViewModel.addMessage(textFieldValue.text)
+                        textFieldValue = TextFieldValue("")
+                        true
+                    }
+                    else {
+                        false // Let other events be handled normally
+                    }
+                }
         )
     }
 }
@@ -208,7 +238,7 @@ fun NewMessageCard(msg : Message, onNavigateToProfile: () -> Unit) {
                 Text(
                     msg.body,
                     modifier = Modifier.padding(all = 4.dp),
-                    //maxLines = if(isExpanded) Int.MAX_VALUE else 1,
+                    maxLines = if(isExpanded) Int.MAX_VALUE else 1,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

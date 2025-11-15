@@ -21,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
@@ -56,15 +54,11 @@ fun NewProfilePage(database: Database,
                    },
                    onNavigateToMessages: () -> Unit ){
     var pickPhoto by remember { mutableStateOf(false) }
-    val image = remember { profilePageViewModel.image }
-    val bitmap = image.value?.bytes?.toImageBitmap()
     val name = remember { profilePageViewModel.name.value }
     var friendAdded = remember { profilePageViewModel.friendAdded.value }
     val friendStatus = remember {mutableStateOf("Add Friend")}
 
-    LaunchedEffect(Unit) {
-        profilePageViewModel.init()
-    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -89,20 +83,22 @@ fun NewProfilePage(database: Database,
                 }
             )
             Row {
-                if (bitmap != null) {
-                    Image(
-                        bitmap = bitmap,
-                        contentDescription = "UserProfilePic",
-                        modifier = Modifier
-                            .clickable(onClick = {
-                                pickPhoto = true
-                            })
-                            .clip(shape = RectangleShape)
-                            .padding(2.dp)
-                            .size(100.dp),
-                    )
-                    Text("Name:$name\nContact:      ", modifier = Modifier.align(Alignment.CenterVertically))
-                }
+                Image(
+                    bitmap = database.getProfilePic(),
+                    contentDescription = "UserProfilePic",
+                    modifier = Modifier
+                        .clickable(onClick = {
+                            pickPhoto = true
+                        })
+                        .clip(shape = RectangleShape)
+                        .padding(2.dp)
+                        .size(100.dp),
+                )
+                Text(
+                    "Name:$name\nContact:      ",
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+
             }
             Button(
                 onClick = {
