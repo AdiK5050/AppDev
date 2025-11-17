@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Query("INSERT INTO UserEntity (username, password) VALUES (:username, :password)")
-    suspend fun insertUser(username: String, password: String)
+    @Insert
+    suspend fun insertUser(entity: UserEntity)
 
     @Query("SELECT * FROM UserEntity")
     fun getAllAsFlow(): Flow<List<UserEntity>>

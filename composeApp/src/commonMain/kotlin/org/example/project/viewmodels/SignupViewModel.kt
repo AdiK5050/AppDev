@@ -8,56 +8,45 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.example.project.storage.UserEntity
 import org.example.project.storage.UserSession
 
 class SignupViewModel(val userSession: UserSession) : ViewModel() {
-    var name by  mutableStateOf("")
-    var password by  mutableStateOf("")
+    var name by mutableStateOf("")
+    var password by mutableStateOf("")
 
-    var isError by  mutableStateOf(false)
-    var errorMessage by  mutableStateOf("")
+    var isError by mutableStateOf(false)
+    var errorMessage by mutableStateOf("")
 
     fun resetInput() {
         name = ""
         password = ""
     }
-    fun signup() : Boolean {
+
+    fun signup() {
         isError = false
         errorMessage = ""
 
-         if(!isBlankField()
-             && !userExist()
-             && !weakPassword()){
-             viewModelScope.async {
-                 userSession.userDao.insertUser(name,password)
-             }
-                resetInput()
-                return true
-        } else {
-            resetInput()
-            isError = true
-        }
-        return false
-    }
-    fun userExist(): Boolean {
-        var userExist = false
         viewModelScope.launch {
-            userSession.userDao.getAllAsFlow().collect { users ->
-                users.forEach {
-                    user -> {
-                        if(user.username == name) {
-                            isError = true
-                            errorMessage = "User Already Exist"
-                            userExist = true
-                        }
-                    }
+            if (!isBlankField() && !userExist() && !weakPassword()) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    userSession.userDao.insertUser(UserEntity(username = name, password = password))
+                    resetInput()
                 }
+            } else {
+                resetInput()
+                isError = true
             }
         }
-        return userExist
+
     }
+
+    private suspend fun userExist(): Boolean {
+        return userSession.userDao.getByName(name) != null
+    }
+
     fun isBlankField(): Boolean {
-        if(name.trim().isEmpty() || password.trim().isEmpty()) {
+        if (name.trim().isEmpty() || password.trim().isEmpty()) {
             isError = true
             errorMessage = "Empty Username or Password"
             return true
@@ -71,11 +60,12 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
         val hasLowerCase = passwordChars.any { it.isLowerCase() }
         val hasDigit = passwordChars.any { it.isDigit() }
 
-        if(
+        if (
             !hasUpperCase
             || !hasLowerCase
             || !hasDigit
-            || password.length < 8) {
+            || password.length < 8
+        ) {
             errorMessage =
                 "Weak Password! It must contain a capital letter, a small letter, a number and be at least 8 characters long"
             return true
