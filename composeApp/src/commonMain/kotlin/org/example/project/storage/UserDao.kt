@@ -1,6 +1,7 @@
 package org.example.project.storage
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -29,8 +30,8 @@ interface MessageDao {
     @Query("SELECT * FROM MessageEntity")
     fun getAllAsFlow(): Flow<List<MessageEntity>>
 
-    @Query("INSERT INTO MessageEntity (uidTo,uidFrom,message) VALUES(:uidTo,:uidFrom,:message)")
-    suspend fun insert(uidTo: Int?, uidFrom: Int, message: String)
+    @Insert
+    suspend fun insert(message: MessageEntity)
 
     @Query("SELECT * FROM MessageEntity WHERE messageId = :messageId ORDER BY timeInMillis DESC")
     suspend fun getByMessageId(messageId: Int): List<MessageEntity>
