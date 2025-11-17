@@ -4,8 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.example.project.storage.UserSession
-import org.example.project.storage.User
 
 class SignupViewModel(val userSession: UserSession) : ViewModel() {
     var name by  mutableStateOf("")
@@ -25,8 +28,9 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
          if(!isBlankField()
              && !userExist()
              && !weakPassword()){
-                userSession.users.add(User(name, password))
-                userSession.saveUserSession(name,password)
+             viewModelScope.async {
+                 userSession.userDao.insertUser(name,password)
+             }
                 resetInput()
                 return true
         } else {
@@ -36,13 +40,21 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
         return false
     }
     fun userExist(): Boolean {
-        for (user in userSession.users) {
-            if (user.name == name) {
-                errorMessage = "Username already exists"
-                return true
+        var userExist = false
+        viewModelScope.launch {
+            userSession.userDao.getAllAsFlow().collect { users ->
+                users.forEach {
+                    user -> {
+                        if(user.username == name) {
+                            isError = true
+                            errorMessage = "User Already Exist"
+                            userExist = true
+                        }
+                    }
+                }
             }
         }
-        return false
+        return userExist
     }
     fun isBlankField(): Boolean {
         if(name.trim().isEmpty() || password.trim().isEmpty()) {

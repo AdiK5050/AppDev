@@ -21,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +37,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
+import kotlinproject.composeapp.generated.resources.download
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
+import org.example.project.toByteArray
 import org.example.project.viewmodels.ProfileViewModel
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
 @Serializable
@@ -57,10 +59,6 @@ fun NewProfilePage(
     val name = remember { profileViewModel.name.value }
     var friendAdded = remember { profileViewModel.friendAdded.value }
     val friendStatus = remember {mutableStateOf("Add Friend")}
-
-    LaunchedEffect(Unit) {
-        profileViewModel.init()
-    }
 
     Surface(
         modifier = Modifier
@@ -86,6 +84,8 @@ fun NewProfilePage(
                 }
             )
             Row {
+                if(profileViewModel.profilePic.value.contentEquals(ByteArray(0))) profileViewModel.profilePic.value =
+                    imageResource(Res.drawable.download).toByteArray()
                 Image(
                     bitmap = profileViewModel.profilePic.value.toImageBitmap(),
                     contentDescription = "UserProfilePic",

@@ -5,9 +5,10 @@ import org.example.project.pages.MessagePage
 import org.example.project.pages.NewLogin
 import org.example.project.viewmodels.AppSetting
 
-class UserSession {
+class UserSession(appDatabase: AppDatabase) {
     private val settings = AppSetting.settings
-    val users = mutableListOf<User>()
+    val userDao = appDatabase.getUserDao()
+    val users = mutableListOf(userDao.getAllAsFlow())
 
     companion object {
         private  const val KEY_USERNAME = "user_username"
@@ -16,6 +17,7 @@ class UserSession {
     }
 
     fun getStartDestination(): Destination {
+        if (isLoggedIn()) return MessagePage
         if (settings.getBoolean(KEY_LOGGED_IN, defaultValue = false)) return MessagePage
         return NewLogin
     }
@@ -40,17 +42,5 @@ class UserSession {
         settings.putBoolean(KEY_LOGGED_IN, false)
     }
 
-//    fun putUserLoginInfo(userName: String, password: String) {
-//        settings.putString(userName, password)
-//    }
-//    fun getUserLoginInfo(): List<User> {
-//        val keys: Set<String> = settings.keys
-//        val loginInfoList: MutableList<User> = mutableListOf<User>()
-//        for(key in keys) {
-//            val userName = key
-//            val password = settings.getStringOrNull(key).toString()
-//            loginInfoList.add(User(userName, password))
-//        }
-//        return loginInfoList
-//    }
+
 }

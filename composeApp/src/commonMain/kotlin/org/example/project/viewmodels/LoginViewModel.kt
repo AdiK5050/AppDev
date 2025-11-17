@@ -4,6 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.example.project.storage.UserSession
 
 class LoginViewModel(val userSession: UserSession) : ViewModel() {
@@ -27,26 +30,32 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
             resetInput()
             return true
         }
-
         resetInput()
         isError = true
         return false
     }
-    fun userFound() :Boolean{
-        for(user in userSession.users) {
-            if (user.name == name) {
-                return true
-            }
+    fun userFound(): Boolean{
+        var userFound = false
+        viewModelScope.async {
+            if(userSession.userDao.getByName(name) != null)
+                userFound = true
+        }
+        if(userFound) {
+            return true
         }
         errorMessage = "User not found"
         return false
     }
 
     fun correctPassword(): Boolean {
-        for (user in userSession.users) {
-            if (user.name == name && user.password == password) {
-                return true
-            }
+        var correctPassword = false
+        viewModelScope.async {
+            if(userSession.userDao.getByName(name)?.password == password)
+                correctPassword = true
+        }
+        if(correctPassword) {
+            isLoggedIn = true
+            return true
         }
         errorMessage = "Incorrect Password"
         return false

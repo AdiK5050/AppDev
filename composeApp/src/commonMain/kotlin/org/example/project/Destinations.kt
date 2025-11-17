@@ -6,36 +6,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.unit.IntRect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.riasgremory
 import org.example.project.pages.MessagePage
 import org.example.project.pages.NewLogin
 import org.example.project.pages.NewMessagePage
 import org.example.project.pages.NewProfilePage
 import org.example.project.pages.NewSignup
 import org.example.project.storage.AppDatabase
-import org.example.project.storage.Database
 import org.example.project.storage.UserSession
 import org.example.project.viewmodels.LoginViewModel
 import org.example.project.viewmodels.MessageViewModel
 import org.example.project.viewmodels.ProfileViewModel
 import org.example.project.viewmodels.SignupViewModel
-import org.jetbrains.compose.resources.imageResource
 
 interface Destination
 class Destinations(appDatabase: AppDatabase)  {
 
-    val database = Database(appDatabase)
-    val userSession = UserSession()
+    val userSession = UserSession(appDatabase)
     val signupViewModel = SignupViewModel(userSession)
     val loginViewModel = LoginViewModel(userSession)
-    val messageViewModel = MessageViewModel(database, userSession)
-    val profileViewModel = ProfileViewModel(database)
+    val messageViewModel = MessageViewModel(appDatabase, userSession)
+    val profileViewModel = ProfileViewModel(appDatabase)
 
     @Composable
     fun CreateDestination() {

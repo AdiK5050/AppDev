@@ -1,36 +1,26 @@
 package org.example.project.pages
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,11 +43,10 @@ import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0
 import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
-import org.example.project.storage.Message
 import org.example.project.storage.MessageEntity
 import org.example.project.viewmodels.MessageViewModel
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.flow.Flow
 
 
 @Serializable
@@ -70,10 +59,8 @@ fun NewMessagePage(
     onNavigateToProfile: () -> Unit,
     onNavigateToLogin: () -> Unit)
     {
-        LaunchedEffect(Unit) {
-            messageViewModel.init()
-        }
-        val messageHistory = remember { messageViewModel.messageHistory }
+
+    val messageHistory = remember { messageViewModel.messageHistory }
 
     Scaffold(
         modifier = Modifier
@@ -121,7 +108,7 @@ fun NewMessagePage(
             MessageContent(
                 messageViewModel,
                 onNavigateToProfile,
-                messageHistory.collectAsState().value,
+                messageHistory.value,
             )
         }
     )
@@ -131,7 +118,7 @@ fun NewMessagePage(
 fun MessageContent(
     messageViewModel: MessageViewModel,
     onNavigateToProfile: () -> Unit,
-    messageHistory: List<MessageEntity>,
+    messageHistory: Flow<List<MessageEntity>>,
 ) {
     var profileClicked by remember { mutableStateOf(false)}
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
