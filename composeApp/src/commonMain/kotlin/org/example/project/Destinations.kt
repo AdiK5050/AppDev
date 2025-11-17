@@ -16,19 +16,13 @@ import org.example.project.pages.NewProfilePage
 import org.example.project.pages.NewSignup
 import org.example.project.storage.AppDatabase
 import org.example.project.storage.UserSession
-import org.example.project.viewmodels.LoginViewModel
 import org.example.project.viewmodels.MessageViewModel
-import org.example.project.viewmodels.ProfileViewModel
-import org.example.project.viewmodels.SignupViewModel
 
 interface Destination
-class Destinations(appDatabase: AppDatabase)  {
+class Destinations(val appDatabase: AppDatabase)  {
 
-    val userSession = UserSession(appDatabase)
-    val signupViewModel = SignupViewModel(userSession)
-    val loginViewModel = LoginViewModel(userSession)
-    val messageViewModel = MessageViewModel(appDatabase, userSession)
-    val profileViewModel = ProfileViewModel(appDatabase)
+    val userSession = UserSession()
+    val messageViewModel = MessageViewModel(appDatabase,userSession)
 
     @Composable
     fun CreateDestination() {
@@ -39,42 +33,42 @@ class Destinations(appDatabase: AppDatabase)  {
         NavHost(
             modifier = Modifier.then(Modifier),
             navController = navController,
-            startDestination = startDestination
+            startDestination = MessagePage
         )
         {
             composable<NewLogin> { backStackEntry ->
                 NewLogin(
-                    loginViewModel,
+                    userSession,
+                    appDatabase,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = MessagePage
                         )
-                    },
-                    onNavigateToSignup = {
-                        navController.navigate(
-                            route = NewSignup
-                        )
                     }
-                )
+                ) {
+                    navController.navigate(
+                        route = NewSignup
+                    )
+                }
             }
             composable<MessagePage> { backStackEntry ->
                 NewMessagePage(
-                    messageViewModel,
                     onNavigateToProfile = {
-                    navController.navigate(
-                        route = NewProfilePage
-                    )
-                },
+                        navController.navigate(
+                            route = NewProfilePage
+                        )
+                    },
                     onNavigateToLogin = {
                         navController.navigate(
                             route = NewLogin
                         )
-                    }
+                    },
+                    messageViewModel = messageViewModel,
                 )
             }
             composable<NewProfilePage> { backStackEntry ->
                 NewProfilePage(
-                    profileViewModel,
+                    appDatabase,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = MessagePage
@@ -83,7 +77,7 @@ class Destinations(appDatabase: AppDatabase)  {
             }
             composable<NewSignup> { backStackEntry ->
                 NewSignup(
-                    signupViewModel,
+                    appDatabase,
                     onNavigateToLogin = {
                         navController.navigate(
                             route = NewLogin
