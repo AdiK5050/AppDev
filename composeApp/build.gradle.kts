@@ -2,13 +2,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-
-
-
-
-
-
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -106,7 +99,7 @@ dependencies {
     debugImplementation(compose.uiTooling)
     add("kspAndroid", libs.androidx.room.compiler)
 //    add("kspCommonMainMetadata", project(":your-ksp-processor-module")) // For common code processing
-//    add("kspJvm", project(":your-ksp-processor-module")) // For JVM desktop processing
+    add("kspJvm", libs.androidx.room.compiler)
 }
 compose.desktop{
     application {
