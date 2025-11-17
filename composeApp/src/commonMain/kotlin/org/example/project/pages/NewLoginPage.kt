@@ -60,13 +60,10 @@ object NewLogin : Destination
 fun NewLogin(
     userSession: UserSession,
     appDatabase: AppDatabase,
-    loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, appDatabase) },
+    loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, appDatabase.getUserDao()) },
     onNavigateToMessages: () -> Unit,
     onNavigateToSignup: () -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        loginViewModel.getAllUsers()
-    }
     var loginFailed by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier

@@ -59,12 +59,9 @@ object NewSignup : Destination
 @Composable
 fun NewSignup(
     appDatabase: AppDatabase
-    , signupViewModel: SignupViewModel = viewModel { SignupViewModel(appDatabase) }
+    , signupViewModel: SignupViewModel = viewModel { SignupViewModel(appDatabase.getUserDao()) }
     , onNavigateToLogin: ()-> Unit
 ) {
-    LaunchedEffect(Unit) {
-        signupViewModel.getAllUsers()
-    }
     var signupFailed by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier

@@ -6,12 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.example.project.storage.UserDao
 import org.example.project.storage.UserEntity
-import org.example.project.storage.UserSession
 
-class SignupViewModel(val userSession: UserSession) : ViewModel() {
+class SignupViewModel(
+    private val userDao: UserDao
+) : ViewModel() {
     var name by mutableStateOf("")
     var password by mutableStateOf("")
 
@@ -27,12 +28,10 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
         isError = false
         errorMessage = ""
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!isBlankField() && !userExist() && !weakPassword()) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    userSession.userDao.insertUser(UserEntity(username = name, password = password))
-                    resetInput()
-                }
+                userDao.insertUser(UserEntity(username = name, password = password))
+                resetInput()
             } else {
                 resetInput()
                 isError = true
@@ -42,7 +41,7 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
     }
 
     private suspend fun userExist(): Boolean {
-        return userSession.userDao.getByName(name) != null
+        return userDao.getByName(name) != null
     }
 
     fun isBlankField(): Boolean {

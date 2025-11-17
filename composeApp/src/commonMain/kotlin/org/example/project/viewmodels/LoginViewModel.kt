@@ -8,9 +8,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.example.project.storage.UserDao
 import org.example.project.storage.UserSession
 
-class LoginViewModel(val userSession: UserSession) : ViewModel() {
+class LoginViewModel(
+    val userSession: UserSession,
+    private val userDao: UserDao
+) : ViewModel() {
 
     var name by mutableStateOf("")
     var password by mutableStateOf("")
@@ -19,6 +23,7 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
     var errorMessage by mutableStateOf("")
 
     var isLoggedIn by mutableStateOf(userSession.isLoggedIn())
+
     fun resetInput() {
         name = ""
         password = ""
@@ -27,7 +32,7 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
     fun login() {
         isError = false
         errorMessage = ""
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!isBlankField() && userFound() && correctPassword()) {
                 resetInput()
                 return@launch
@@ -39,7 +44,7 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
     }
 
     private suspend fun userFound(): Boolean {
-        val userFound = userSession.userDao.getByName(name) != null
+        val userFound = userDao.getByName(name) != null
         if (userFound) {
             return true
         }
@@ -48,7 +53,7 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
     }
 
     private suspend fun correctPassword(): Boolean {
-        val correctPassword = userSession.userDao.getByName(name)?.password == password
+        val correctPassword = userDao.getByName(name)?.password == password
         if (correctPassword) {
             isLoggedIn = true
             return true
