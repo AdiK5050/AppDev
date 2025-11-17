@@ -12,8 +12,6 @@ interface UserDao {
 
     @Query("SELECT * FROM UserEntity")
     fun getAllAsFlow(): Flow<List<UserEntity>>
-    @Query("SELECT * FROM UserEntity")
-    suspend fun getAll(): List<UserEntity>
 
     @Query("SELECT profilePic FROM UserEntity where uid = :uid")
     suspend fun getPicByUID(uid: Int): ByteArray

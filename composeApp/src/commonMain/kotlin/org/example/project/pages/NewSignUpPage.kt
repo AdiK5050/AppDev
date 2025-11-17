@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,11 +42,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.visibility_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.visibility_off_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
+import org.example.project.storage.AppDatabase
+import org.example.project.storage.UserSession
 import org.example.project.viewmodels.SignupViewModel
 import org.jetbrains.compose.resources.painterResource
 
@@ -54,10 +58,13 @@ object NewSignup : Destination
 
 @Composable
 fun NewSignup(
-     signupViewModel: SignupViewModel
+    appDatabase: AppDatabase
+    , signupViewModel: SignupViewModel = viewModel { SignupViewModel(appDatabase) }
     , onNavigateToLogin: ()-> Unit
-
 ) {
+    LaunchedEffect(Unit) {
+        signupViewModel.getAllUsers()
+    }
     var signupFailed by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier

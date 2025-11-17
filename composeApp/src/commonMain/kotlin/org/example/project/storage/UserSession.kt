@@ -5,10 +5,8 @@ import org.example.project.pages.MessagePage
 import org.example.project.pages.NewLogin
 import org.example.project.viewmodels.AppSetting
 
-class UserSession(appDatabase: AppDatabase) {
+class UserSession() {
     private val settings = AppSetting.settings
-    val userDao = appDatabase.getUserDao()
-    val users = mutableListOf(userDao.getAllAsFlow())
 
     companion object {
         private  const val KEY_USERNAME = "user_username"

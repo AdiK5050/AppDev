@@ -41,6 +41,5 @@ data class MessageEntity(
     val uidFrom: Int,
     val uidTo: Int?,
     val message: String,
-    @ColumnInfo("timeInMillis")
     val timeInMillis: Long = System.currentTimeMillis()
 )

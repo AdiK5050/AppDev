@@ -5,11 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.example.project.storage.AppDatabase
+import org.example.project.storage.UserEntity
 import org.example.project.storage.UserSession
 
-class LoginViewModel(val userSession: UserSession) : ViewModel() {
+class LoginViewModel(val userSession: UserSession, appDatabase: AppDatabase) : ViewModel() {
 
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
@@ -17,16 +21,25 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
 
+    val userDao = appDatabase.getUserDao()
+
+    var users = MutableStateFlow<List<UserEntity>>(emptyList())
     var isLoggedIn by mutableStateOf(userSession.isLoggedIn())
+
+    fun getAllUsers() = viewModelScope.launch {
+        userDao.getAllAsFlow().collect { list ->
+            users.value = list
+        }
+    }
     fun resetInput() {
         name = ""
         password = ""
     }
-
     fun login() : Boolean {
         isError = false
         errorMessage = ""
         if (!isBlankField() && userFound() && correctPassword()) {
+            userSession.saveUserSession(name, password)
             resetInput()
             return true
         }
@@ -35,27 +48,18 @@ class LoginViewModel(val userSession: UserSession) : ViewModel() {
         return false
     }
     fun userFound(): Boolean{
-        var userFound = false
-        viewModelScope.async {
-            if(userSession.userDao.getByName(name) != null)
-                userFound = true
-        }
-        if(userFound) {
-            return true
+        users.value.forEach { user ->
+            if(user.username == name)
+                return true
         }
         errorMessage = "User not found"
         return false
     }
 
     fun correctPassword(): Boolean {
-        var correctPassword = false
-        viewModelScope.async {
-            if(userSession.userDao.getByName(name)?.password == password)
-                correctPassword = true
-        }
-        if(correctPassword) {
-            isLoggedIn = true
-            return true
+        users.value.forEach { user ->
+            if(user.username == name && user.password == password)
+                return true
         }
         errorMessage = "Incorrect Password"
         return false

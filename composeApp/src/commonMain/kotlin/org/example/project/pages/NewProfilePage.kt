@@ -34,12 +34,15 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.download
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
+import org.example.project.storage.AppDatabase
+import org.example.project.storage.UserSession
 import org.example.project.toByteArray
 import org.example.project.viewmodels.ProfileViewModel
 import org.jetbrains.compose.resources.imageResource
@@ -51,8 +54,9 @@ object NewProfilePage : Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewProfilePage(
-    profileViewModel: ProfileViewModel,
-   onNavigateToMessages: () -> Unit)
+    appDatabase: AppDatabase
+    , profileViewModel: ProfileViewModel = viewModel { ProfileViewModel(appDatabase) }
+    , onNavigateToMessages: () -> Unit)
 {
     var uid by remember { mutableStateOf(profileViewModel.uid)}
     var pickPhoto by remember { mutableStateOf(false) }

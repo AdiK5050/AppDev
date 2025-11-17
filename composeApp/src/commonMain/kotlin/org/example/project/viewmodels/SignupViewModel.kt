@@ -1,22 +1,36 @@
 package org.example.project.viewmodels
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.example.project.storage.AppDatabase
+import org.example.project.storage.UserEntity
 import org.example.project.storage.UserSession
 
-class SignupViewModel(val userSession: UserSession) : ViewModel() {
+class SignupViewModel(appDatabase: AppDatabase) : ViewModel() {
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
 
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
 
+    val userDao = appDatabase.getUserDao()
+
+    val users = MutableStateFlow<List<UserEntity>>(emptyList())
+
+    fun getAllUsers() = viewModelScope.launch{
+        userDao.getAllAsFlow().collect { list ->
+            users.value = list
+        }
+    }
     fun resetInput() {
         name = ""
         password = ""
@@ -28,8 +42,8 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
          if(!isBlankField()
              && !userExist()
              && !weakPassword()){
-             viewModelScope.async {
-                 userSession.userDao.insertUser(name,password)
+             viewModelScope.async (Dispatchers.IO) {
+                 userDao.insertUser(name,password)
              }
                 resetInput()
                 return true
@@ -41,19 +55,7 @@ class SignupViewModel(val userSession: UserSession) : ViewModel() {
     }
     fun userExist(): Boolean {
         var userExist = false
-        viewModelScope.launch {
-            userSession.userDao.getAllAsFlow().collect { users ->
-                users.forEach {
-                    user -> {
-                        if(user.username == name) {
-                            isError = true
-                            errorMessage = "User Already Exist"
-                            userExist = true
-                        }
-                    }
-                }
-            }
-        }
+
         return userExist
     }
     fun isBlankField(): Boolean {

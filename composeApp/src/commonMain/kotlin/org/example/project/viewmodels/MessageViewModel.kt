@@ -17,7 +17,7 @@ import org.example.project.storage.AppDatabase
 import org.example.project.storage.MessageEntity
 import org.example.project.storage.UserSession
 
-class MessageViewModel(appDatabase: AppDatabase, val userSession: UserSession) : ViewModel() {
+class MessageViewModel(val appDatabase: AppDatabase, val userSession: UserSession) : ViewModel() {
 
     val messageDao = appDatabase.getMessageDao()
     val messageHistory = messageDao.getAllAsFlow()
