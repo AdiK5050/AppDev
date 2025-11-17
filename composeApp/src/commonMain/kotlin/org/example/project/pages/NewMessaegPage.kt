@@ -38,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -48,29 +47,31 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
-import org.example.project.viewmodels.Database
-import org.example.project.viewmodels.Message
+import org.example.project.Destination
+import org.example.project.storage.Message
+import org.example.project.storage.MessageEntity
 import org.example.project.viewmodels.MessageViewModel
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.runtime.collectAsState
 
 
 @Serializable
-object MessagePage
+object MessagePage : Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewMessagePage(database: Database,
-                   messageViewModel: MessageViewModel = viewModel { MessageViewModel(database) },
-                   onNavigateToProfile: () -> Unit,
-                   onNavigateToLogin: () -> Unit)
+fun NewMessagePage(
+    messageViewModel: MessageViewModel,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToLogin: () -> Unit)
     {
         LaunchedEffect(Unit) {
-            messageViewModel.initMessageHistory()
+            messageViewModel.init()
         }
         val messageHistory = remember { messageViewModel.messageHistory }
 
@@ -100,7 +101,7 @@ fun NewMessagePage(database: Database,
                     IconButton (
                         onClick = {
                             onNavigateToLogin()
-                            database.clearUserSession()},
+                            messageViewModel.userSession.clearUserSession()},
                         content = {
                             Icon(
                                 painter = painterResource(Res.drawable.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
@@ -120,7 +121,7 @@ fun NewMessagePage(database: Database,
             MessageContent(
                 messageViewModel,
                 onNavigateToProfile,
-                messageHistory,
+                messageHistory.collectAsState().value,
             )
         }
     )
@@ -130,8 +131,9 @@ fun NewMessagePage(database: Database,
 fun MessageContent(
     messageViewModel: MessageViewModel,
     onNavigateToProfile: () -> Unit,
-    messageHistory: List<Message>,
+    messageHistory: List<MessageEntity>,
 ) {
+    var profileClicked by remember { mutableStateOf(false)}
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
     var buttonPressed by remember { mutableStateOf(false) }
     val enterIcon = @Composable {
@@ -160,9 +162,10 @@ fun MessageContent(
             modifier = Modifier
                 .weight(1f)
         ) {
-            items(messageHistory) { message ->
-                NewMessageCard(message, onNavigateToProfile)
-            }
+//            items(messageHistory) { messageEntity ->
+//                val message = messageEntity.message
+//                NewMessageCard(message , onNavigateToProfile)
+//            }
         }
         OutlinedTextField(
             value = textFieldValue,
@@ -199,61 +202,58 @@ fun MessageContent(
     }
 }
 @Composable
-fun NewMessageCard(msg : Message, onNavigateToProfile: () -> Unit) {
-    var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
-    var profilePic by remember { mutableStateOf(msg.profilePic)}
-    if(msg.action == "receiver")
-        horizontalArrangement = Arrangement.End
-    else if(msg.action == "sender")
-        horizontalArrangement = Arrangement.Start
-    Row(
-        modifier = Modifier
-            .padding(all = 8.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = horizontalArrangement,
-    ){
-        if(profilePic != null)
-            ImageVisibility(profilePic as ImageBitmap, onNavigateToProfile)
-        var isExpanded by remember { mutableStateOf(false)}
-        val surfaceColor by animateColorAsState(
-            if(isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-        )
-        Column (
-            modifier = Modifier
-                .clickable {isExpanded = !isExpanded },
-        ) {
-            Text(
-                msg.author,
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(3.dp))
-
-            Surface(
-                shape = MaterialTheme.shapes.small,
-                shadowElevation = 1.dp,
-                color = surfaceColor,
-                modifier = Modifier.animateContentSize().padding(1.dp)
-            ) {
-                Text(
-                    msg.body,
-                    modifier = Modifier.padding(all = 4.dp),
-                    maxLines = if(isExpanded) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
+fun NewMessageCard(username: String, message: String, profilePic: ByteArray, profileClicked: Boolean, onNavigateToProfile: () -> Unit) {
+//    var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
+//    Row(
+//        modifier = Modifier
+//            .padding(all = 8.dp)
+//            .fillMaxWidth(),
+//        horizontalArrangement = horizontalArrangement,
+//    ){
+//
+//            ImageVisibility(profileClicked,profilePic, onNavigateToProfile)
+//        var isExpanded by remember { mutableStateOf(false)}
+//        val surfaceColor by animateColorAsState(
+//            if(isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+//        )
+//        Column (
+//            modifier = Modifier
+//                .clickable {isExpanded = !isExpanded },
+//        ) {
+//            Text(
+//                username,
+//                color = MaterialTheme.colorScheme.primary,
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//            Spacer(modifier = Modifier.height(3.dp))
+//
+//            Surface(
+//                shape = MaterialTheme.shapes.small,
+//                shadowElevation = 1.dp,
+//                color = surfaceColor,
+//                modifier = Modifier.animateContentSize().padding(1.dp)
+//            ) {
+//                Text(
+//                    message,
+//                    modifier = Modifier.padding(all = 4.dp),
+//                    maxLines = if(isExpanded) Int.MAX_VALUE else 1,
+//                    style = MaterialTheme.typography.bodySmall
+//                )
+//            }
+//        }
+//    }
 }
 
 @Composable
-fun ImageVisibility(profilePic: ImageBitmap, onNavigateToProfile: () -> Unit) {
+fun ImageVisibility(profileClicked: Boolean, profilePic: ByteArray, onNavigateToProfile: () -> Unit) {
     Image(
-        bitmap = profilePic,
+        bitmap = profilePic.toImageBitmap(),
         contentDescription = "A photo of a beauty.",
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .clickable(enabled = true, onClick = {onNavigateToProfile()})
+            .clickable(enabled = true, onClick = {
+                onNavigateToProfile()
+            })
     )
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.IntRect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,22 +18,29 @@ import org.example.project.pages.NewLogin
 import org.example.project.pages.NewMessagePage
 import org.example.project.pages.NewProfilePage
 import org.example.project.pages.NewSignup
-import org.example.project.viewmodels.Database
+import org.example.project.storage.AppDatabase
+import org.example.project.storage.Database
+import org.example.project.storage.UserSession
+import org.example.project.viewmodels.LoginViewModel
+import org.example.project.viewmodels.MessageViewModel
+import org.example.project.viewmodels.ProfileViewModel
+import org.example.project.viewmodels.SignupViewModel
 import org.jetbrains.compose.resources.imageResource
 
-class Destinations()  {
+interface Destination
+class Destinations(appDatabase: AppDatabase)  {
 
-    val database = Database()
+    val database = Database(appDatabase)
+    val userSession = UserSession()
+    val signupViewModel = SignupViewModel(userSession)
+    val loginViewModel = LoginViewModel(userSession)
+    val messageViewModel = MessageViewModel(database, userSession)
+    val profileViewModel = ProfileViewModel(database)
 
     @Composable
     fun CreateDestination() {
 
-        val profilePic: ImageBitmap = imageResource(Res.drawable.riasgremory)
-        var startDestination: Any by remember {mutableStateOf(database.getStartDestination())}
-
-        database.setProfilePic(profilePic)
-        database.initUserLoginInfo()
-        database.initMessageHistory()
+        var startDestination: Destination by remember {mutableStateOf(userSession.getStartDestination())}
 
         val navController = rememberNavController()
         NavHost(
@@ -43,7 +51,7 @@ class Destinations()  {
         {
             composable<NewLogin> { backStackEntry ->
                 NewLogin(
-                    database = database,
+                    loginViewModel,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = MessagePage
@@ -58,7 +66,7 @@ class Destinations()  {
             }
             composable<MessagePage> { backStackEntry ->
                 NewMessagePage(
-                    database,
+                    messageViewModel,
                     onNavigateToProfile = {
                     navController.navigate(
                         route = NewProfilePage
@@ -73,7 +81,7 @@ class Destinations()  {
             }
             composable<NewProfilePage> { backStackEntry ->
                 NewProfilePage(
-                    database,
+                    profileViewModel,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = MessagePage
@@ -82,7 +90,7 @@ class Destinations()  {
             }
             composable<NewSignup> { backStackEntry ->
                 NewSignup(
-                    database = database,
+                    signupViewModel,
                     onNavigateToLogin = {
                         navController.navigate(
                             route = NewLogin

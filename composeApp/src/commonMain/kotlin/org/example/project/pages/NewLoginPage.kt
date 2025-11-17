@@ -46,17 +46,17 @@ import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.visibility_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.visibility_off_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
-import org.example.project.viewmodels.Database
+import org.example.project.Destination
+import org.example.project.storage.Database
 import org.example.project.viewmodels.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
 
 @Serializable
-object NewLogin
+object NewLogin : Destination
 
 @Composable
 fun NewLogin(
-    database: Database
-     , loginViewModel: LoginViewModel = viewModel {LoginViewModel(database = database)}
+      loginViewModel: LoginViewModel
      , onNavigateToMessages:() -> Unit
      , onNavigateToSignup: ()-> Unit
 

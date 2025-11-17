@@ -27,7 +27,8 @@ fun main() = application {
                 color = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 Column {
-                    val destinations = Destinations()
+                    val appDatabase = getDatabaseBuilder()
+                    val destinations = Destinations(appDatabase)
                     destinations.CreateDestination()
                 }
             }

@@ -4,8 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import org.example.project.storage.UserSession
 
-class LoginViewModel(val database: Database) : ViewModel() {
+class LoginViewModel(val userSession: UserSession) : ViewModel() {
 
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
@@ -13,7 +14,7 @@ class LoginViewModel(val database: Database) : ViewModel() {
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
 
-    var isLoggedIn by mutableStateOf(database.isLoggedIn())
+    var isLoggedIn by mutableStateOf(userSession.isLoggedIn())
     fun resetInput() {
         name = ""
         password = ""
@@ -32,7 +33,7 @@ class LoginViewModel(val database: Database) : ViewModel() {
         return false
     }
     fun userFound() :Boolean{
-        for(user in database.users) {
+        for(user in userSession.users) {
             if (user.name == name) {
                 return true
             }
@@ -42,7 +43,7 @@ class LoginViewModel(val database: Database) : ViewModel() {
     }
 
     fun correctPassword(): Boolean {
-        for (user in database.users) {
+        for (user in userSession.users) {
             if (user.name == name && user.password == password) {
                 return true
             }

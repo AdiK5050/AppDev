@@ -4,16 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import org.example.project.storage.UserSession
+import org.example.project.storage.User
 
-class SignupViewModel(val database: Database) : ViewModel() {
+class SignupViewModel(val userSession: UserSession) : ViewModel() {
     var name by  mutableStateOf("")
     var password by  mutableStateOf("")
 
-
     var isError by  mutableStateOf(false)
     var errorMessage by  mutableStateOf("")
-
-
 
     fun resetInput() {
         name = ""
@@ -26,9 +25,9 @@ class SignupViewModel(val database: Database) : ViewModel() {
          if(!isBlankField()
              && !userExist()
              && !weakPassword()){
-                database.addUser(User(name, password))
+                userSession.users.add(User(name, password))
+                userSession.saveUserSession(name,password)
                 resetInput()
-                //storeUserdata.putUserLoginInfo(name, password)
                 return true
         } else {
             resetInput()
@@ -37,7 +36,7 @@ class SignupViewModel(val database: Database) : ViewModel() {
         return false
     }
     fun userExist(): Boolean {
-        for (user in database.users) {
+        for (user in userSession.users) {
             if (user.name == name) {
                 errorMessage = "Username already exists"
                 return true

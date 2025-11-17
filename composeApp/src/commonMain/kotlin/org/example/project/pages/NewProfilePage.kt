@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,30 +35,32 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
-import org.example.project.viewmodels.Database
-import org.example.project.viewmodels.ProfilePageViewModel
+import org.example.project.Destination
+import org.example.project.viewmodels.ProfileViewModel
 import org.jetbrains.compose.resources.painterResource
 
 @Serializable
-object NewProfilePage
+object NewProfilePage : Destination
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewProfilePage(database: Database,
-                   profilePageViewModel: ProfilePageViewModel = viewModel {
-                       ProfilePageViewModel(
-                           database
-                       )
-                   },
-                   onNavigateToMessages: () -> Unit ){
+fun NewProfilePage(
+    profileViewModel: ProfileViewModel,
+   onNavigateToMessages: () -> Unit)
+{
+    var uid by remember { mutableStateOf(profileViewModel.uid)}
     var pickPhoto by remember { mutableStateOf(false) }
-    val name = remember { profilePageViewModel.name.value }
-    var friendAdded = remember { profilePageViewModel.friendAdded.value }
+    val name = remember { profileViewModel.name.value }
+    var friendAdded = remember { profileViewModel.friendAdded.value }
     val friendStatus = remember {mutableStateOf("Add Friend")}
 
+    LaunchedEffect(Unit) {
+        profileViewModel.init()
+    }
 
     Surface(
         modifier = Modifier
@@ -84,7 +87,7 @@ fun NewProfilePage(database: Database,
             )
             Row {
                 Image(
-                    bitmap = database.getProfilePic(),
+                    bitmap = profileViewModel.profilePic.value.toImageBitmap(),
                     contentDescription = "UserProfilePic",
                     modifier = Modifier
                         .clickable(onClick = {
@@ -134,7 +137,7 @@ fun NewProfilePage(database: Database,
                         Row {
                             Button(
                                 onClick = {
-                                    if (pickPhoto) profilePageViewModel.chooseImage()
+                                    if (pickPhoto) profileViewModel.chooseImage()
                                     pickPhoto = false
                                 },
                                 modifier = Modifier.weight(0.5f)

@@ -50,7 +50,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Column {
-                        val destinations = Destinations()
+                        val appDatabase = getDatabaseBuilder(this@MainActivity)
+                        val destinations = Destinations(appDatabase)
                         destinations.CreateDestination()
                     }
                 }
