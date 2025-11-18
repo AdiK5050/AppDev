@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,20 +35,21 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
 import org.example.project.storage.MessageEntity
 import org.example.project.viewmodels.MessageViewModel
 import org.jetbrains.compose.resources.painterResource
-import kotlinx.coroutines.flow.Flow
 
 
 @Serializable
@@ -56,12 +58,12 @@ object MessagePage : Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewMessagePage(
-    messageViewModel: MessageViewModel ,
+    messageViewModel: MessageViewModel,
     onNavigateToProfile: () -> Unit,
-    onNavigateToLogin: () -> Unit)
-    {
+    onNavigateToLogin: () -> Unit
+) {
 
-    val messageHistory = remember { messageViewModel.messageHistory }
+    val messageHistory by messageViewModel.messageHistory.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier
@@ -86,10 +88,11 @@ fun NewMessagePage(
                     )
                 },
                 actions = {
-                    IconButton (
+                    IconButton(
                         onClick = {
                             onNavigateToLogin()
-                            messageViewModel.userSession.clearUserSession()},
+                            messageViewModel.userSession.clearUserSession()
+                        },
                         content = {
                             Icon(
                                 painter = painterResource(Res.drawable.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
@@ -105,8 +108,10 @@ fun NewMessagePage(
                 )
             )
         },
-        content = { padding -> {Modifier.padding(5.dp)}
+        content = { padding ->
+            { Modifier.padding(5.dp) }
             MessageContent(
+                modifier = Modifier.padding(padding),
                 messageViewModel,
                 onNavigateToProfile,
                 messageHistory,
@@ -117,11 +122,12 @@ fun NewMessagePage(
 
 @Composable
 fun MessageContent(
+    modifier: Modifier,
     messageViewModel: MessageViewModel,
     onNavigateToProfile: () -> Unit,
-    messageHistory: Flow<List<MessageEntity>>,
+    messageHistory: List<MessageEntity>,
 ) {
-    var profileClicked by remember { mutableStateOf(false)}
+    var profileClicked by remember { mutableStateOf(false) }
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
     var buttonPressed by remember { mutableStateOf(false) }
     val enterIcon = @Composable {
@@ -144,16 +150,16 @@ fun MessageContent(
         }
     }
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().then(modifier)
     ) {
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
         ) {
-//            items(messageHistory) { messageEntity ->
-//                val message = messageEntity.message
-//                NewMessageCard(message , onNavigateToProfile)
-//            }
+            items(messageHistory) { messageEntity ->
+                val message = messageEntity.message
+                Text(text = message)
+            }
         }
         OutlinedTextField(
             value = textFieldValue,
@@ -176,21 +182,26 @@ fun MessageContent(
                             selection = TextRange(cursorPosition + 1)
                         )
                         true // Consume the event
-                    }
-                    else if(it.type == KeyEventType.KeyDown && it.key == Key.Enter && textFieldValue.text.isNotBlank()) {
+                    } else if (it.type == KeyEventType.KeyDown && it.key == Key.Enter && textFieldValue.text.isNotBlank()) {
                         messageViewModel.addMessage(textFieldValue.text)
                         textFieldValue = TextFieldValue("")
                         true
-                    }
-                    else {
+                    } else {
                         false // Let other events be handled normally
                     }
                 }
         )
     }
 }
+
 @Composable
-fun NewMessageCard(username: String, message: String, profilePic: ByteArray, profileClicked: Boolean, onNavigateToProfile: () -> Unit) {
+fun NewMessageCard(
+    username: String,
+    message: String,
+    profilePic: ByteArray,
+    profileClicked: Boolean,
+    onNavigateToProfile: () -> Unit
+) {
 //    var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
 //    Row(
 //        modifier = Modifier
@@ -233,7 +244,11 @@ fun NewMessageCard(username: String, message: String, profilePic: ByteArray, pro
 }
 
 @Composable
-fun ImageVisibility(profileClicked: Boolean, profilePic: ByteArray, onNavigateToProfile: () -> Unit) {
+fun ImageVisibility(
+    profileClicked: Boolean,
+    profilePic: ByteArray,
+    onNavigateToProfile: () -> Unit
+) {
     Image(
         bitmap = profilePic.toImageBitmap(),
         contentDescription = "A photo of a beauty.",

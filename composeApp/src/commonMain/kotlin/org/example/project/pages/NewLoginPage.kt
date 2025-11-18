@@ -58,16 +58,12 @@ object NewLogin : Destination
 
 @Composable
 fun NewLogin(
-    userSession: UserSession
-     , appDatabase: AppDatabase
-     , loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, appDatabase) }
-     , onNavigateToMessages:() -> Unit
-     , onNavigateToSignup: ()-> Unit
-
+    userSession: UserSession,
+    appDatabase: AppDatabase,
+    loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, appDatabase.getUserDao()) },
+    onNavigateToMessages: () -> Unit,
+    onNavigateToSignup: () -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        loginViewModel.getAllUsers()
-    }
     var loginFailed by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier
@@ -85,18 +81,22 @@ fun NewLogin(
                 modifier = Modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("Adi Chat"
-                    , fontSize = 30.sp
-                    , fontWeight = FontWeight.ExtraBold
-                    , color = Color.White
-                    , modifier = Modifier.padding()
-                    , textAlign = TextAlign.Center)
+                Text(
+                    "Adi Chat",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    modifier = Modifier.padding(),
+                    textAlign = TextAlign.Center
+                )
 
-                Text("A cool new way to chat with your friends"
-                    , fontSize = 10.sp
-                    , color = Color.White
-                    , modifier = Modifier.padding()
-                    , textAlign = TextAlign.Center)
+                Text(
+                    "A cool new way to chat with your friends",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(),
+                    textAlign = TextAlign.Center
+                )
                 Spacer(Modifier.size(10.dp))
                 Column(
                     modifier = Modifier
@@ -142,7 +142,7 @@ fun NewLogin(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text =  loginViewModel.errorMessage,
+                            text = loginViewModel.errorMessage,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
@@ -155,13 +155,13 @@ fun NewLogin(
                     shape = RoundedCornerShape(5.dp),
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceContainerHighest),
                     onClick = {
-                    loginViewModel.login()
-                    if (!loginViewModel.isError) {
-                        onNavigateToMessages()
-                    }else {
-                        loginFailed = loginViewModel.isError
-                    }
-                }) {
+                        loginViewModel.login()
+                        if (!loginViewModel.isError) {
+                            onNavigateToMessages()
+                        } else {
+                            loginFailed = loginViewModel.isError
+                        }
+                    }) {
                     Text("Log-In", color = Color.White, fontWeight = FontWeight.Bold)
                 }
 
@@ -169,12 +169,13 @@ fun NewLogin(
                 Row {
                     Text("Don't have an account?")
                     Spacer(Modifier.size(2.dp))
-                    Text("Sign-Up",
+                    Text(
+                        "Sign-Up",
                         modifier = Modifier
                             .padding()
                             .clickable {
-                            onNavigateToSignup()
-                        },
+                                onNavigateToSignup()
+                            },
                         color = Color.White,
                     )
                 }
@@ -182,6 +183,7 @@ fun NewLogin(
         }
     }
 }
+
 @Composable
 fun NewLogInLayout(
     name: String,
@@ -196,14 +198,14 @@ fun NewLogInLayout(
         value = name,
         label = { Text("Enter Your Name") },
         readOnly = false,
-        keyboardOptions =  KeyboardOptions.Default.copy(
+        keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
             onDone = { onKeyboardDone() }
         ),
         colors = TextFieldDefaults.colors(
-            Color.White,Color.White,
+            Color.White, Color.White,
             focusedContainerColor = MaterialTheme.colorScheme.background,
             unfocusedContainerColor = MaterialTheme.colorScheme.background,
             errorTextColor = Color.Red, errorLabelColor = Color.Red,
@@ -214,27 +216,27 @@ fun NewLogInLayout(
         value = password,
         label = { Text("Enter Your Password") },
         readOnly = false,
-        visualTransformation = if(!visibility) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions =  KeyboardOptions.Default.copy(
+        visualTransformation = if (!visibility) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done,
-            keyboardType = if(visibility) KeyboardType.Text else KeyboardType.Password
+            keyboardType = if (visibility) KeyboardType.Text else KeyboardType.Password
         ),
         keyboardActions = KeyboardActions(
-            onDone = {onKeyboardDone()}
+            onDone = { onKeyboardDone() }
         ),
         colors = TextFieldDefaults.colors(
-            Color.White,Color.White,
+            Color.White, Color.White,
             focusedContainerColor = MaterialTheme.colorScheme.background,
             unfocusedContainerColor = MaterialTheme.colorScheme.background,
             errorTextColor = Color.Red, errorLabelColor = Color.Red,
-            ),
+        ),
         trailingIcon = @Composable {
             IconButton(
-                onClick = {visibility = !visibility},
+                onClick = { visibility = !visibility },
                 content = {
                     Icon(
-                        painter = if(!visibility) painterResource(Res.drawable.visibility_off_24dp_e3e3e3_fill0_wght400_grad0_opsz24)
-                                    else painterResource(Res.drawable.visibility_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
+                        painter = if (!visibility) painterResource(Res.drawable.visibility_off_24dp_e3e3e3_fill0_wght400_grad0_opsz24)
+                        else painterResource(Res.drawable.visibility_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
                         contentDescription = "visibility",
                         tint = Color.White,
                     )
