@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +48,6 @@ import kotlinproject.composeapp.generated.resources.visibility_off_24dp_e3e3e3_f
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
 import org.example.project.storage.AppDatabase
-import org.example.project.storage.UserSession
 import org.example.project.viewmodels.SignupViewModel
 import org.jetbrains.compose.resources.painterResource
 
@@ -62,7 +60,7 @@ fun NewSignup(
     , signupViewModel: SignupViewModel = viewModel { SignupViewModel(appDatabase.getUserDao()) }
     , onNavigateToLogin: ()-> Unit
 ) {
-    var signupFailed by remember { mutableStateOf(false) }
+    var navigateToLogin by remember {mutableStateOf(false)}
     Surface(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -107,31 +105,19 @@ fun NewSignup(
                     NewSignUpLayout(
                         name = signupViewModel.name,
                         password = signupViewModel.password,
-                        onKeyboardDone =
-                            {
-                                signupViewModel.signup()
-                                if (!signupViewModel.isError) {
-                                    onNavigateToLogin
-                                } else {
-                                    signupFailed = signupViewModel.isError
-                                }
-                            },
+                        onKeyboardDone = { signupViewModel.signup() },
                         onUserNameChanged = {
                             signupViewModel.name = it
-                            signupViewModel.errorMessage = ""
-                            signupViewModel.isError = false
-                            signupFailed = signupViewModel.isError
+                            signupViewModel.resetErrorStatus()
                         },
                         onUserPasswordChanged = {
                             signupViewModel.password = it
-                            signupViewModel.errorMessage = ""
-                            signupViewModel.isError = false
-                            signupFailed = signupViewModel.isError
+                            signupViewModel.resetErrorStatus()
                         },
                     )
                 }
                 Spacer(Modifier.size(2.dp))
-                AnimatedVisibility(signupFailed) {
+                AnimatedVisibility(signupViewModel.isError.value) {
                     Column {
                         Text(
                             text = "Sign-Up Failed",
@@ -140,7 +126,7 @@ fun NewSignup(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text =  signupViewModel.errorMessage,
+                            text =  signupViewModel.errorMessage.value,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
@@ -152,15 +138,10 @@ fun NewSignup(
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(5.dp),
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceContainerHighest),
-                    onClick = {
-                        signupViewModel.signup()
-                        if (!signupViewModel.isError) {
-                            onNavigateToLogin()
-                        }else {
-                            signupFailed = signupViewModel.isError
-                        }
-                    }) {
+                    onClick = { signupViewModel.signup() }
+                ) {
                     Text("Sign-Up", color = Color.White, fontWeight = FontWeight.Bold)
+                    if(signupViewModel.signupSuccessful.value) onNavigateToLogin()
                 }
                 Spacer(Modifier.size(5.dp))
                 Row {
@@ -170,10 +151,11 @@ fun NewSignup(
                         modifier = Modifier
                             .padding()
                             .clickable {
-                                onNavigateToLogin()
+                                navigateToLogin = true
                             },
                         color = Color.White,
                     )
+                    if(navigateToLogin) {onNavigateToLogin()}
                 }
             }
         }

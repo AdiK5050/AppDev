@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.visibility_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.visibility_off_24dp_e3e3e3_fill0_wght400_grad0_opsz24
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
 import org.example.project.storage.AppDatabase
@@ -56,6 +56,7 @@ import org.jetbrains.compose.resources.painterResource
 @Serializable
 object NewLogin : Destination
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun NewLogin(
     userSession: UserSession,
@@ -64,7 +65,8 @@ fun NewLogin(
     onNavigateToMessages: () -> Unit,
     onNavigateToSignup: () -> Unit
 ) {
-    var loginFailed by remember { mutableStateOf(false) }
+    var navigateToSignup by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -109,31 +111,19 @@ fun NewLogin(
                     NewLogInLayout(
                         name = loginViewModel.name,
                         password = loginViewModel.password,
-                        onKeyboardDone =
-                            {
-                                loginViewModel.login()
-                                if (!loginViewModel.isError) {
-                                    onNavigateToMessages()
-                                } else {
-                                    loginFailed = loginViewModel.isError
-                                }
-                            },
+                        onKeyboardDone = { loginViewModel.login() },
                         onUserNameChanged = {
                             loginViewModel.name = it
-                            loginViewModel.errorMessage = ""
-                            loginViewModel.isError = false
-                            loginFailed = loginViewModel.isError
+                            loginViewModel.resetErrorStatus()
                         },
                         onUserPasswordChanged = {
                             loginViewModel.password = it
-                            loginViewModel.errorMessage = ""
-                            loginViewModel.isError = false
-                            loginFailed = loginViewModel.isError
+                            loginViewModel.resetErrorStatus()
                         },
                     )
                 }
                 Spacer(Modifier.size(2.dp))
-                AnimatedVisibility(loginFailed) {
+                AnimatedVisibility(loginViewModel.isError.value) {
                     Column {
                         Text(
                             text = "Log-In Failed",
@@ -142,7 +132,7 @@ fun NewLogin(
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text = loginViewModel.errorMessage,
+                            text = loginViewModel.errorMessage.value,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
@@ -154,15 +144,10 @@ fun NewLogin(
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(5.dp),
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceContainerHighest),
-                    onClick = {
-                        loginViewModel.login()
-                        if (!loginViewModel.isError) {
-                            onNavigateToMessages()
-                        } else {
-                            loginFailed = loginViewModel.isError
-                        }
-                    }) {
+                    onClick = { loginViewModel.login() }
+                ) {
                     Text("Log-In", color = Color.White, fontWeight = FontWeight.Bold)
+                    if(loginViewModel.loginSuccess.value) { onNavigateToMessages() }
                 }
 
                 Spacer(Modifier.size(5.dp))
@@ -173,11 +158,10 @@ fun NewLogin(
                         "Sign-Up",
                         modifier = Modifier
                             .padding()
-                            .clickable {
-                                onNavigateToSignup()
-                            },
+                            .clickable { navigateToSignup = true },
                         color = Color.White,
                     )
+                    if(navigateToSignup) { onNavigateToSignup() }
                 }
             }
         }

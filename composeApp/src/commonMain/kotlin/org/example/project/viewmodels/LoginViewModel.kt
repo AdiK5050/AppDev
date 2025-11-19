@@ -1,12 +1,11 @@
 package org.example.project.viewmodels
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.example.project.storage.UserDao
 import org.example.project.storage.UserSession
@@ -19,8 +18,12 @@ class LoginViewModel(
     var name by mutableStateOf("")
     var password by mutableStateOf("")
 
-    var isError by mutableStateOf(false)
-    var errorMessage by mutableStateOf("")
+    private var _loginSuccess = mutableStateOf(false)
+    val loginSuccess: State<Boolean> = _loginSuccess
+
+    private var _isError = mutableStateOf(false)
+    val isError: State<Boolean> = _isError
+    var errorMessage = mutableStateOf("")
 
     var isLoggedIn by mutableStateOf(userSession.isLoggedIn())
 
@@ -28,27 +31,30 @@ class LoginViewModel(
         name = ""
         password = ""
     }
-
-    fun login() {
-        isError = false
-        errorMessage = ""
-        viewModelScope.launch(Dispatchers.IO) {
-            if (!isBlankField() && userFound() && correctPassword()) {
-                resetInput()
-                return@launch
-            }
-
-            resetInput()
-            isError = true
-        }
+    fun resetErrorStatus() {
+        _isError.value = false
+        errorMessage.value = ""
     }
+   fun login(){
+       viewModelScope.launch {
+           if (!isBlankField() && userFound() && correctPassword()) {
+               userSession.saveUserSession(name, password)
+                   _loginSuccess.value = true
+           }
+           else {
+               _isError.value = true
+               resetInput()
+           }
+           println(errorMessage)
+       }
+   }
 
     private suspend fun userFound(): Boolean {
-        val userFound = userDao.getByName(name) != null
-        if (userFound) {
+        val userFound = userDao.getByName(name)
+        if (userFound != null) {
             return true
         }
-        errorMessage = "User not found"
+        errorMessage.value = "User not found"
         return false
     }
 
@@ -58,14 +64,13 @@ class LoginViewModel(
             isLoggedIn = true
             return true
         }
-        errorMessage = "Incorrect Password"
+        errorMessage.value = "Incorrect Password"
         return false
     }
 
     fun isBlankField(): Boolean {
         if (name.trim().isEmpty() || password.trim().isEmpty()) {
-            isError = true
-            errorMessage = "Empty Username or Password"
+            errorMessage.value = "Empty Username or Password"
             return true
         }
         return false

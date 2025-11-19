@@ -1,6 +1,5 @@
 package org.example.project.storage
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,7 +9,7 @@ data class UserEntity(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     val username: String,
     val password: String,
-    val profilePic: ByteArray = ByteArray(0),
+    val profilePic: ByteArray? = ByteArray(0),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

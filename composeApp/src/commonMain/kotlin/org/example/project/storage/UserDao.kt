@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
     @Insert
-    suspend fun insertUser(entity: UserEntity)
+    suspend fun insertUser(user: UserEntity)
 
     @Query("SELECT * FROM UserEntity")
     fun getAllAsFlow(): Flow<List<UserEntity>>
@@ -19,6 +19,8 @@ interface UserDao {
     @Query("UPDATE UserEntity SET profilePic = :profilePic WHERE uid = :uid")
     suspend fun setPicByUID(uid:Int, profilePic: ByteArray)
 
+    @Query("SELECT * FROM UserEntity WHERE uid = :uid")
+    suspend fun getByUID(uid: Int): UserEntity?
     @Query("SELECT * FROM UserEntity WHERE username = :username")
     suspend fun getByName(username: String): UserEntity?
 }
@@ -29,7 +31,7 @@ interface MessageDao {
     fun getAllAsFlow(): Flow<List<MessageEntity>>
 
     @Insert
-    suspend fun insert(message: MessageEntity)
+    suspend fun insertMessage(message: MessageEntity)
 
     @Query("SELECT * FROM MessageEntity WHERE messageId = :messageId ORDER BY timeInMillis DESC")
     suspend fun getByMessageId(messageId: Int): List<MessageEntity>

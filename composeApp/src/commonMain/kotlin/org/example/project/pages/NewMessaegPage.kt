@@ -1,11 +1,17 @@
 package org.example.project.pages
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,8 +22,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,7 +43,6 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -43,12 +50,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
+import kotlinproject.composeapp.generated.resources.download
 import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
-import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
 import org.example.project.storage.MessageEntity
+import org.example.project.storage.UserEntity
+import org.example.project.toByteArray
 import org.example.project.viewmodels.MessageViewModel
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
 
@@ -157,8 +167,16 @@ fun MessageContent(
                 .weight(1f)
         ) {
             items(messageHistory) { messageEntity ->
-                val message = messageEntity.message
-                Text(text = message)
+                val uidFrom = messageEntity.uidFrom
+                val userEntity: UserEntity? = messageViewModel.getUserEntity(uidFrom)
+
+                NewMessageCard(
+                    messageEntity.message,
+                    userEntity?.username.toString(),
+                    userEntity?.profilePic,
+                    { profileClicked = !profileClicked },
+                    { onNavigateToProfile() }
+                )
             }
         }
         OutlinedTextField(
@@ -181,13 +199,13 @@ fun MessageContent(
                             text = newText,
                             selection = TextRange(cursorPosition + 1)
                         )
-                        true // Consume the event
+                        true
                     } else if (it.type == KeyEventType.KeyDown && it.key == Key.Enter && textFieldValue.text.isNotBlank()) {
                         messageViewModel.addMessage(textFieldValue.text)
                         textFieldValue = TextFieldValue("")
                         true
                     } else {
-                        false // Let other events be handled normally
+                        false
                     }
                 }
         )
@@ -196,56 +214,60 @@ fun MessageContent(
 
 @Composable
 fun NewMessageCard(
-    username: String,
     message: String,
-    profilePic: ByteArray,
-    profileClicked: Boolean,
+    username: String,
+    profilePic: ByteArray?,
+    onProfileClick: () -> Unit,
     onNavigateToProfile: () -> Unit
 ) {
-//    var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
-//    Row(
-//        modifier = Modifier
-//            .padding(all = 8.dp)
-//            .fillMaxWidth(),
-//        horizontalArrangement = horizontalArrangement,
-//    ){
-//
-//            ImageVisibility(profileClicked,profilePic, onNavigateToProfile)
-//        var isExpanded by remember { mutableStateOf(false)}
-//        val surfaceColor by animateColorAsState(
-//            if(isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-//        )
-//        Column (
-//            modifier = Modifier
-//                .clickable {isExpanded = !isExpanded },
-//        ) {
-//            Text(
-//                username,
-//                color = MaterialTheme.colorScheme.primary,
-//                style = MaterialTheme.typography.titleMedium
-//            )
-//            Spacer(modifier = Modifier.height(3.dp))
-//
-//            Surface(
-//                shape = MaterialTheme.shapes.small,
-//                shadowElevation = 1.dp,
-//                color = surfaceColor,
-//                modifier = Modifier.animateContentSize().padding(1.dp)
-//            ) {
-//                Text(
-//                    message,
-//                    modifier = Modifier.padding(all = 4.dp),
-//                    maxLines = if(isExpanded) Int.MAX_VALUE else 1,
-//                    style = MaterialTheme.typography.bodySmall
-//                )
-//            }
-//        }
-//    }
+    var profilePic by remember { mutableStateOf(profilePic) }
+    var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
+    Row(
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = horizontalArrangement,
+    ){
+        if( profilePic == null) {
+            println("ProfilePic was null")
+            profilePic = imageResource(Res.drawable.download).toByteArray()
+        }
+        ImageVisibility(onProfileClick, profilePic!!, onNavigateToProfile)
+        var isExpanded by remember { mutableStateOf(false)}
+        val surfaceColor by animateColorAsState(
+            if(isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        )
+        Column (
+            modifier = Modifier
+                .clickable {isExpanded = !isExpanded },
+        ) {
+            Text(
+                username,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+
+            Surface(
+                shape = MaterialTheme.shapes.small,
+                shadowElevation = 1.dp,
+                color = surfaceColor,
+                modifier = Modifier.animateContentSize().padding(1.dp)
+            ) {
+                Text(
+                    message,
+                    modifier = Modifier.padding(all = 4.dp),
+                    maxLines = if(isExpanded) Int.MAX_VALUE else 1,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
 }
 
 @Composable
 fun ImageVisibility(
-    profileClicked: Boolean,
+    onProfileClick: () -> Unit,
     profilePic: ByteArray,
     onNavigateToProfile: () -> Unit
 ) {
@@ -256,6 +278,7 @@ fun ImageVisibility(
             .size(40.dp)
             .clip(CircleShape)
             .clickable(enabled = true, onClick = {
+                onProfileClick()
                 onNavigateToProfile()
             })
     )

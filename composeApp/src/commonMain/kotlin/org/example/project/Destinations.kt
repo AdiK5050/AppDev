@@ -33,7 +33,7 @@ class Destinations(val appDatabase: AppDatabase)  {
         NavHost(
             modifier = Modifier.then(Modifier),
             navController = navController,
-            startDestination = MessagePage
+            startDestination = startDestination
         )
         {
             composable<NewLogin> { backStackEntry ->
@@ -53,6 +53,7 @@ class Destinations(val appDatabase: AppDatabase)  {
             }
             composable<MessagePage> { backStackEntry ->
                 NewMessagePage(
+                    messageViewModel,
                     onNavigateToProfile = {
                         navController.navigate(
                             route = NewProfilePage
@@ -63,7 +64,6 @@ class Destinations(val appDatabase: AppDatabase)  {
                             route = NewLogin
                         )
                     },
-                    messageViewModel = messageViewModel,
                 )
             }
             composable<NewProfilePage> { backStackEntry ->
