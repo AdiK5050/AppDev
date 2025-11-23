@@ -20,7 +20,7 @@ class ProfileViewModel(val appDatabase: AppDatabase) : ViewModel() {
 
     fun init() {
         viewModelScope.launch(Dispatchers.IO) {
-                profilePic.value = userDao.getPicByUID(uid.value)
+                profilePic.value = userDao.getPicByUID(uid.value)!!
         }
     }
     fun chooseImage() = viewModelScope.launch {

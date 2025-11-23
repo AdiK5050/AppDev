@@ -13,5 +13,6 @@ fun getDatabaseBuilder(): AppDatabase {
         name = dbFile.absolutePath,
     ).setQueryCoroutineContext(Dispatchers.IO)
         .setDriver(BundledSQLiteDriver())
+        .fallbackToDestructiveMigration(true)
         .build()
 }

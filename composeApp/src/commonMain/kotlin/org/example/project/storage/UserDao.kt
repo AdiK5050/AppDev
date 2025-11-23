@@ -13,14 +13,16 @@ interface UserDao {
     @Query("SELECT * FROM UserEntity")
     fun getAllAsFlow(): Flow<List<UserEntity>>
 
-    @Query("SELECT profilePic FROM UserEntity where uid = :uid")
-    suspend fun getPicByUID(uid: Int): ByteArray
+    @Query("SELECT userID FROM UserEntity WHERE username = :username")
+    suspend fun getUIDByName(username: String): Int
+    @Query("SELECT profilePic FROM UserEntity WHERE userID = :userID")
+    suspend fun getPicByUID(userID: Int): ByteArray?
 
-    @Query("UPDATE UserEntity SET profilePic = :profilePic WHERE uid = :uid")
-    suspend fun setPicByUID(uid:Int, profilePic: ByteArray)
+    @Query("UPDATE UserEntity SET profilePic = :profilePic WHERE userID = :userID")
+    suspend fun setPicByUID(userID:Int, profilePic: ByteArray)
 
-    @Query("SELECT * FROM UserEntity WHERE uid = :uid")
-    suspend fun getByUID(uid: Int): UserEntity?
+    @Query("SELECT * FROM UserEntity WHERE userID = :userID")
+    suspend fun getByUID(userID: Int): UserEntity?
     @Query("SELECT * FROM UserEntity WHERE username = :username")
     suspend fun getByName(username: String): UserEntity?
 }
@@ -33,6 +35,16 @@ interface MessageDao {
     @Insert
     suspend fun insertMessage(message: MessageEntity)
 
-    @Query("SELECT * FROM MessageEntity WHERE messageId = :messageId ORDER BY timeInMillis DESC")
-    suspend fun getByMessageId(messageId: Int): List<MessageEntity>
+    @Query("SELECT message FROM MessageEntity WHERE channelID = :channelID ORDER BY timeInMillis DESC")
+    suspend fun getLastMessageByChannelID(channelID: Int): String
+}
+
+@Dao
+interface ChannelDao {
+    @Insert
+    suspend fun insertChannel(channel: ChannelEntity)
+
+    @Query("SELECT * FROM ChannelEntity")
+    fun getAllAsFlow(): Flow<List<ChannelEntity>>
+
 }

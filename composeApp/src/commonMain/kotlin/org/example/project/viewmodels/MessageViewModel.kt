@@ -26,8 +26,8 @@ class MessageViewModel(appDatabase: AppDatabase, val userSession: UserSession) :
             initialValue = emptyList()
         )
 
-    val uidFrom = mutableIntStateOf(0)
-    val uidTo: MutableState<Int?> = mutableStateOf(null)
+    val senderID = mutableIntStateOf(0)
+    val channelID: MutableState<Int> = mutableStateOf(0)
 
     fun getUserEntity(uid: Int) : UserEntity? {
         var userEntity: UserEntity? = null
@@ -39,15 +39,13 @@ class MessageViewModel(appDatabase: AppDatabase, val userSession: UserSession) :
     suspend fun getUidFrom() {
         val userEntity = userDao.getByName(userSession.getUsername())
         if(userEntity != null) {
-            uidFrom.intValue = userEntity.uid
+            senderID.intValue = userEntity.userID
         }
     }
     fun addMessage(message: String) {
         viewModelScope.launch(Dispatchers.IO) {
             getUidFrom()
-            messageDao.insertMessage(MessageEntity(uidTo = uidTo.value, uidFrom = uidFrom.intValue, message = message))
-            if (uidTo.value == null) println("uidTo was null")
-            else println("uidTo was not null")
+            messageDao.insertMessage(MessageEntity(channelID = channelID.value, senderID = senderID.intValue, message = message))
         }
     }
 }

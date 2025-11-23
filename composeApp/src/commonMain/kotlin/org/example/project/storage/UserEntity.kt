@@ -1,12 +1,13 @@
 package org.example.project.storage
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 
 @Entity
 data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
+    @PrimaryKey(autoGenerate = true) val userID: Int = 0,
     val username: String,
     val password: String,
     val profilePic: ByteArray? = ByteArray(0),
@@ -17,7 +18,7 @@ data class UserEntity(
 
         other as UserEntity
 
-        if (uid != other.uid) return false
+        if (userID != other.userID) return false
         if (username != other.username) return false
         if (password != other.password) return false
         if (!profilePic.contentEquals(other.profilePic)) return false
@@ -26,7 +27,7 @@ data class UserEntity(
     }
 
     override fun hashCode(): Int {
-        var result = uid.hashCode()
+        var result = userID.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
         result = 31 * result + (profilePic.contentHashCode())
@@ -34,11 +35,34 @@ data class UserEntity(
     }
 }
 
-@Entity
+@Entity(
+    foreignKeys = arrayOf(
+        ForeignKey(
+        entity = UserEntity::class,
+        parentColumns = ["userID"],
+        childColumns = ["senderID"],
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE,
+        ),
+        ForeignKey(
+            entity = ChannelEntity::class,
+            parentColumns = ["channelID"],
+            childColumns = ["channelID"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    )
+)
 data class MessageEntity(
     @PrimaryKey(autoGenerate = true) val messageId: Long = 0,
-    val uidFrom: Int,
-    val uidTo: Int?,
+    val senderID: Int,
+    val channelID: Int,
     val message: String,
     val timeInMillis: Long = System.currentTimeMillis()
+)
+
+@Entity
+data class ChannelEntity(
+    @PrimaryKey(autoGenerate = true) val channelID: Int = 0,
+    val channelName: String,
 )

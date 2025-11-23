@@ -1,6 +1,7 @@
 package org.example.project.storage
 
 import org.example.project.Destination
+import org.example.project.pages.ChatList
 import org.example.project.pages.MessagePage
 import org.example.project.pages.NewLogin
 import org.example.project.viewmodels.AppSetting
@@ -15,8 +16,7 @@ class UserSession() {
     }
 
     fun getStartDestination(): Destination {
-        if (isLoggedIn()) return MessagePage
-        if (settings.getBoolean(KEY_LOGGED_IN, defaultValue = false)) return MessagePage
+        if (isLoggedIn()) return ChatList
         return NewLogin
     }
     fun getUsername(): String {

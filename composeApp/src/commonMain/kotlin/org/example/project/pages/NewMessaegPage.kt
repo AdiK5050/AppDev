@@ -47,6 +47,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
@@ -60,6 +61,7 @@ import org.example.project.toByteArray
 import org.example.project.viewmodels.MessageViewModel
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Serializable
@@ -167,7 +169,7 @@ fun MessageContent(
                 .weight(1f)
         ) {
             items(messageHistory) { messageEntity ->
-                val uidFrom = messageEntity.uidFrom
+                val uidFrom = messageEntity.senderID
                 val userEntity: UserEntity? = messageViewModel.getUserEntity(uidFrom)
 
                 NewMessageCard(
