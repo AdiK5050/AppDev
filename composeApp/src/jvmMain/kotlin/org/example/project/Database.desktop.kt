@@ -8,10 +8,10 @@ import java.io.File
 
 fun getDatabaseBuilder(): AppDatabase {
     val dbFile = File("my_room.db")
-    println(dbFile.absolutePath)
     return Room.databaseBuilder<AppDatabase>(
         name = dbFile.absolutePath,
     ).setQueryCoroutineContext(Dispatchers.IO)
         .setDriver(BundledSQLiteDriver())
+        .fallbackToDestructiveMigration(true)
         .build()
 }

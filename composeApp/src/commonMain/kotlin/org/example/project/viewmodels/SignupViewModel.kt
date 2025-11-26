@@ -55,7 +55,6 @@ class SignupViewModel(
         val user = userDao.getByName(name)
         if(user != null){
             _errorMessage.value = "User already exists."
-            println(_errorMessage.value)
             return true
         }
         return false

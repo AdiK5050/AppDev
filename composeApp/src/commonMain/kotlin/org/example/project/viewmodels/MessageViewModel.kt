@@ -1,6 +1,5 @@
 package org.example.project.viewmodels
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -14,40 +13,42 @@ import org.example.project.storage.MessageEntity
 import org.example.project.storage.UserEntity
 import org.example.project.storage.UserSession
 
-class MessageViewModel(appDatabase: AppDatabase, val userSession: UserSession) : ViewModel() {
+class MessageViewModel(appDatabase: AppDatabase, val userSession: UserSession, val sharedViewModel: SharedViewModel) : ViewModel() {
 
-    val messageDao = appDatabase.getMessageDao()
+    var _loading = mutableStateOf(false)
+    val loading = _loading.value
     val userDao = appDatabase.getUserDao()
+    val messageDao = appDatabase.getMessageDao()
+    val channelDao = appDatabase.getChannelDao()
 
-    val messageHistory = messageDao.getAllAsFlow()
+    val senderID = mutableIntStateOf(sharedViewModel.LOGGED_IN_USER_ID.intValue)
+    var channelID = mutableIntStateOf(0)
+    var channelName = mutableStateOf("")
+    val channelMembers: MutableList<UserEntity> = mutableListOf()
+    val messageHistory = messageDao.getAllMessagesByChannelID(sharedViewModel.currentChannelID)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    val uidFrom = mutableIntStateOf(0)
-    val uidTo: MutableState<Int?> = mutableStateOf(null)
-
-    fun getUserEntity(uid: Int) : UserEntity? {
-        var userEntity: UserEntity? = null
-        viewModelScope.launch(Dispatchers.IO) {
-            userEntity = userDao.getByUID(uid)
+    fun initAll() {
+        viewModelScope.launch {
+            channelID.intValue = sharedViewModel.currentChannelID
+            channelName.value = channelDao.getChannelNameByChannelID(channelID.intValue)
+            val members = channelDao.getMembersByChannelID(channelID.intValue)
+            members.forEach { memberID ->
+            channelMembers.add(userDao.getUserByUserID(memberID))
+            }
         }
-        return userEntity
     }
-    suspend fun getUidFrom() {
-        val userEntity = userDao.getByName(userSession.getUsername())
-        if(userEntity != null) {
-            uidFrom.intValue = userEntity.uid
-        }
+
+    fun setCurrentUserID(userID: Int) {
+        sharedViewModel.currentUserID = userID
     }
     fun addMessage(message: String) {
+        channelID.intValue = sharedViewModel.currentChannelID
         viewModelScope.launch(Dispatchers.IO) {
-            getUidFrom()
-            messageDao.insertMessage(MessageEntity(uidTo = uidTo.value, uidFrom = uidFrom.intValue, message = message))
-            if (uidTo.value == null) println("uidTo was null")
-            else println("uidTo was not null")
+            messageDao.insertMessage(MessageEntity(channelID = channelID.intValue, senderID = senderID.intValue, message = message))
         }
     }
 }

@@ -10,6 +10,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.lifecycle.viewmodel.compose.viewModel
+import org.example.project.storage.UserSession
+import org.example.project.viewmodels.SharedViewModel
 
 fun main() = application {
     Window(
@@ -28,7 +31,9 @@ fun main() = application {
             ) {
                 Column {
                     val appDatabase = getDatabaseBuilder()
-                    val destinations = Destinations(appDatabase)
+                    val userSession = UserSession()
+                    val sharedViewModel = viewModel { SharedViewModel(userSession) }
+                    val destinations = Destinations(appDatabase, sharedViewModel)
                     destinations.CreateDestination()
                 }
             }

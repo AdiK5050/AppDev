@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,10 +32,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,17 +51,19 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wannaverse.imageselector.toImageBitmap
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinproject.composeapp.generated.resources.download
-import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
+import org.example.project.storage.AppDatabase
 import org.example.project.storage.MessageEntity
-import org.example.project.storage.UserEntity
+import org.example.project.storage.UserSession
 import org.example.project.toByteArray
 import org.example.project.viewmodels.MessageViewModel
+import org.example.project.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -68,11 +74,16 @@ object MessagePage : Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewMessagePage(
-    messageViewModel: MessageViewModel,
+    appDatabase: AppDatabase,
+    userSession: UserSession,
+    sharedViewModel: SharedViewModel,
+    messageViewModel: MessageViewModel = viewModel { MessageViewModel(appDatabase,userSession,sharedViewModel) },
     onNavigateToProfile: () -> Unit,
-    onNavigateToLogin: () -> Unit
+    onNavigateToChatList: () -> Unit,
 ) {
-
+    LaunchedEffect(Unit) {
+        messageViewModel.initAll()
+    }
     val messageHistory by messageViewModel.messageHistory.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -84,30 +95,17 @@ fun NewMessagePage(
         topBar = {
             TopAppBar(
                 modifier = Modifier.background(color = Color.Black),
-                title = { Text("New Message") },
+                title = { Text(messageViewModel.channelName.value) },
                 navigationIcon = @Composable {
                     IconButton(
-                        onClick = {},
+                        onClick = {
+                            onNavigateToChatList()
+                        },
                         content = {
                             Icon(
                                 painter = painterResource(Res.drawable.arrow_back_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
                                 contentDescription = "Back",
                                 tint = Color.White,
-                            )
-                        }
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            onNavigateToLogin()
-                            messageViewModel.userSession.clearUserSession()
-                        },
-                        content = {
-                            Icon(
-                                painter = painterResource(Res.drawable.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
-                                contentDescription = "Logout",
-                                tint = Color.White
                             )
                         }
                     )
@@ -123,8 +121,8 @@ fun NewMessagePage(
             MessageContent(
                 modifier = Modifier.padding(padding),
                 messageViewModel,
-                onNavigateToProfile,
                 messageHistory,
+                onNavigateToProfile,
             )
         }
     )
@@ -134,8 +132,8 @@ fun NewMessagePage(
 fun MessageContent(
     modifier: Modifier,
     messageViewModel: MessageViewModel,
-    onNavigateToProfile: () -> Unit,
     messageHistory: List<MessageEntity>,
+    onNavigateToProfile: () -> Unit,
 ) {
     var profileClicked by remember { mutableStateOf(false) }
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
@@ -167,14 +165,17 @@ fun MessageContent(
                 .weight(1f)
         ) {
             items(messageHistory) { messageEntity ->
-                val uidFrom = messageEntity.uidFrom
-                val userEntity: UserEntity? = messageViewModel.getUserEntity(uidFrom)
-
+                val userEntity = messageViewModel.channelMembers.first(
+                    { it.userID == messageEntity.senderID }
+                )
                 NewMessageCard(
                     messageEntity.message,
-                    userEntity?.username.toString(),
-                    userEntity?.profilePic,
-                    { profileClicked = !profileClicked },
+                    userEntity.username,
+                    userEntity.profilePic,
+                    {
+                        profileClicked = !profileClicked
+                        messageViewModel.setCurrentUserID(userEntity.userID)
+                    },
                     { onNavigateToProfile() }
                 )
             }
@@ -229,7 +230,6 @@ fun NewMessageCard(
         horizontalArrangement = horizontalArrangement,
     ){
         if( profilePic == null) {
-            println("ProfilePic was null")
             profilePic = imageResource(Res.drawable.download).toByteArray()
         }
         ImageVisibility(onProfileClick, profilePic!!, onNavigateToProfile)
@@ -268,11 +268,14 @@ fun NewMessageCard(
 @Composable
 fun ImageVisibility(
     onProfileClick: () -> Unit,
-    profilePic: ByteArray,
+    profilePic: ByteArray?,
     onNavigateToProfile: () -> Unit
 ) {
     Image(
-        bitmap = profilePic.toImageBitmap(),
+        bitmap = if(profilePic == null || profilePic.contentEquals(ByteArray(0)))
+                    imageResource(Res.drawable.download)
+                else
+                    profilePic.toImageBitmap(),
         contentDescription = "A photo of a beauty.",
         modifier = Modifier
             .size(40.dp)
@@ -282,4 +285,13 @@ fun ImageVisibility(
                 onNavigateToProfile()
             })
     )
+}
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+    }
 }

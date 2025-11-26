@@ -1,31 +1,45 @@
 package org.example.project.viewmodels
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wannaverse.imageselector.ImageData
 import com.wannaverse.imageselector.selectImage
-import kotlinx.coroutines.Dispatchers
+import com.wannaverse.imageselector.toImageBitmap
 import kotlinx.coroutines.launch
 import org.example.project.storage.AppDatabase
+import org.example.project.storage.UserEntity
+import org.example.project.toByteArray
 
-class ProfileViewModel(val appDatabase: AppDatabase) : ViewModel() {
+class ProfileViewModel(val appDatabase: AppDatabase, sharedViewModel: SharedViewModel) : ViewModel() {
 
     val userDao = appDatabase.getUserDao()
-    var uid = mutableStateOf(0)
+    val userID = mutableIntStateOf(sharedViewModel.currentUserID)
+    val user: MutableState<UserEntity> = mutableStateOf(UserEntity(userID.intValue,"",""))
     var image = mutableStateOf<ImageData?>(null)
-    var profilePic = mutableStateOf<ByteArray>(ByteArray(0))
-    var name = mutableStateOf("")
+    var profilePic: MutableState<ByteArray?> = mutableStateOf(ByteArray(0))
+    var name: MutableState<String> = mutableStateOf("")
     var friendAdded = mutableStateOf(false)
 
-    fun init() {
-        viewModelScope.launch(Dispatchers.IO) {
-                profilePic.value = userDao.getPicByUID(uid.value)
+    fun initAll() {
+        println("UserID: ${userID.intValue}")
+        println("UserName: ${name.value}")
+        println("profilePic value: ${profilePic.value}")
+        viewModelScope.launch {
+            user.value = userDao.getUserByUserID(userID.intValue)
+            name.value = user.value.username
+            profilePic.value = user.value.profilePic
         }
+        println("UserName: ${name.value}")
+        println("profilePic value: ${profilePic.value}")
     }
     fun chooseImage() = viewModelScope.launch {
         image.value = selectImage()
-        if(image.value != null)
-            userDao.setPicByUID(uid.value, profilePic.value)
+        if(image.value != null) {
+            profilePic.value = image.value?.bytes?.toImageBitmap()?.toByteArray()
+            userDao.setPicByUID(userID.intValue, image.value!!.bytes!!.toImageBitmap().toByteArray())
+        }
     }
 }

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "ec8887d7cc532ba943231abd04320af1",
+    "version": 4,
+    "identityHash": "adf3afd4a0fdab25dfa0f499a0243af8",
     "entities": [
       {
         "tableName": "UserEntity",
@@ -41,7 +41,7 @@
       },
       {
         "tableName": "MessageEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `senderID` INTEGER NOT NULL, `channelID` INTEGER, `message` TEXT NOT NULL, `timeInMillis` INTEGER NOT NULL, FOREIGN KEY(`senderID`) REFERENCES `UserEntity`(`userID`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `senderID` INTEGER NOT NULL, `channelID` INTEGER NOT NULL, `message` TEXT NOT NULL, `timeInMillis` INTEGER NOT NULL, FOREIGN KEY(`senderID`) REFERENCES `UserEntity`(`userID`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`channelID`) REFERENCES `ChannelEntity`(`channelID`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "messageId",
@@ -58,7 +58,8 @@
           {
             "fieldPath": "channelID",
             "columnName": "channelID",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "message",
@@ -90,13 +91,48 @@
             "referencedColumns": [
               "userID"
             ]
+          },
+          {
+            "table": "ChannelEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "channelID"
+            ],
+            "referencedColumns": [
+              "channelID"
+            ]
           }
         ]
+      },
+      {
+        "tableName": "ChannelEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelName` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "channelID",
+            "columnName": "channelID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelName",
+            "columnName": "channelName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "channelID"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ec8887d7cc532ba943231abd04320af1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'adf3afd4a0fdab25dfa0f499a0243af8')"
     ]
   }
 }

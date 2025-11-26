@@ -5,11 +5,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 
-@Database(entities = [UserEntity::class, MessageEntity::class], version = 2)
+@Database(
+    entities = [UserEntity::class,
+        MessageEntity::class,
+        ChannelEntity::class,
+        ChannelMembers::class,
+               ],
+    version = 8)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getUserDao(): UserDao
     abstract fun getMessageDao(): MessageDao
+    abstract fun getChannelDao(): ChannelDao
 }
 
 // The Room compiler generates the `actual` implementations.
