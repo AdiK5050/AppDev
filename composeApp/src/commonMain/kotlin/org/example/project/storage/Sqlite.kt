@@ -6,8 +6,12 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 
 @Database(
-    entities = [UserEntity::class, MessageEntity::class, ChannelEntity::class],
-    version = 4)
+    entities = [UserEntity::class,
+        MessageEntity::class,
+        ChannelEntity::class,
+        ChannelMembers::class,
+               ],
+    version = 8)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getUserDao(): UserDao

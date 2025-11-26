@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,9 +43,8 @@ import kotlinproject.composeapp.generated.resources.download
 import kotlinx.serialization.Serializable
 import org.example.project.Destination
 import org.example.project.storage.AppDatabase
-import org.example.project.storage.UserSession
-import org.example.project.toByteArray
 import org.example.project.viewmodels.ProfileViewModel
+import org.example.project.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -54,13 +54,15 @@ object NewProfilePage : Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewProfilePage(
-    appDatabase: AppDatabase
-    , profileViewModel: ProfileViewModel = viewModel { ProfileViewModel(appDatabase) }
-    , onNavigateToMessages: () -> Unit)
+    appDatabase: AppDatabase,
+    sharedViewModel: SharedViewModel,
+    profileViewModel: ProfileViewModel = viewModel { ProfileViewModel(appDatabase, sharedViewModel) },
+    onNavigateToMessages: () -> Unit)
 {
-    var uid by remember { mutableStateOf(profileViewModel.uid)}
+    LaunchedEffect(Unit) {
+        profileViewModel.initAll()
+    }
     var pickPhoto by remember { mutableStateOf(false) }
-    val name = remember { profileViewModel.name.value }
     var friendAdded = remember { profileViewModel.friendAdded.value }
     val friendStatus = remember {mutableStateOf("Add Friend")}
 
@@ -88,10 +90,11 @@ fun NewProfilePage(
                 }
             )
             Row {
-                if(profileViewModel.profilePic.value.contentEquals(ByteArray(0))) profileViewModel.profilePic.value =
-                    imageResource(Res.drawable.download).toByteArray()
                 Image(
-                    bitmap = profileViewModel.profilePic.value.toImageBitmap(),
+                    bitmap =  if(profileViewModel.profilePic.value.contentEquals(ByteArray(0)) || profileViewModel.profilePic.value == null)
+                        imageResource(Res.drawable.download)
+                    else
+                        profileViewModel.profilePic.value!!.toImageBitmap(),
                     contentDescription = "UserProfilePic",
                     modifier = Modifier
                         .clickable(onClick = {
@@ -102,7 +105,7 @@ fun NewProfilePage(
                         .size(100.dp),
                 )
                 Text(
-                    "Name:$name\nContact:      ",
+                    "Name:${profileViewModel.name.value}\nContact:      ",
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
 

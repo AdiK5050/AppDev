@@ -61,8 +61,43 @@ data class MessageEntity(
     val timeInMillis: Long = System.currentTimeMillis()
 )
 
-@Entity
+@Entity(
+    foreignKeys = arrayOf(
+        ForeignKey(
+        entity = UserEntity::class,
+        parentColumns = ["userID"],
+        childColumns = ["userCreatedID"],
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE,
+        )
+    )
+)
 data class ChannelEntity(
     @PrimaryKey(autoGenerate = true) val channelID: Int = 0,
     val channelName: String,
+    val userCreatedID: Int,
+)
+
+@Entity(
+    foreignKeys = arrayOf(
+        ForeignKey(
+            entity = UserEntity::class,
+            parentColumns = ["userID"],
+            childColumns = ["memberID"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        ),
+        ForeignKey(
+            entity = ChannelEntity::class,
+            parentColumns = ["channelID"],
+            childColumns = ["channelID"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    )
+)
+data class ChannelMembers(
+    @PrimaryKey(autoGenerate = true) val channelMembersID: Int = 0,
+    val channelID: Int,
+    val memberID: Int,
 )

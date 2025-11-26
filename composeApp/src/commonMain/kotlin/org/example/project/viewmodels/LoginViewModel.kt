@@ -12,6 +12,7 @@ import org.example.project.storage.UserSession
 
 class LoginViewModel(
     val userSession: UserSession,
+    val sharedViewModel: SharedViewModel,
     private val userDao: UserDao
 ) : ViewModel() {
 
@@ -38,14 +39,14 @@ class LoginViewModel(
    fun login(){
        viewModelScope.launch {
            if (!isBlankField() && userFound() && correctPassword()) {
-               userSession.saveUserSession(name, password)
+               userSession.saveUserSession(name, password, userDao.getUIDByName(name))
+               sharedViewModel.LOGGED_IN_USER_ID.intValue = userSession.getUserId()
                    _loginSuccess.value = true
            }
            else {
                _isError.value = true
                resetInput()
            }
-           println(errorMessage)
        }
    }
 

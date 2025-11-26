@@ -16,8 +16,11 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wannaverse.imageselector.registerImageSelectorLauncher
 import com.wannaverse.imageselector.setImageSelectorActivity
+import org.example.project.storage.UserSession
+import org.example.project.viewmodels.SharedViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -51,7 +54,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column {
                         val appDatabase = getDatabaseBuilder(this@MainActivity)
-                        val destinations = Destinations(appDatabase)
+                        val userSession = UserSession()
+                        val sharedViewModel = viewModel { SharedViewModel(userSession) }
+                        val destinations = Destinations(appDatabase,sharedViewModel)
                         destinations.CreateDestination()
                     }
                 }

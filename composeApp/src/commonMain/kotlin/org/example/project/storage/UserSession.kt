@@ -1,9 +1,5 @@
 package org.example.project.storage
 
-import org.example.project.Destination
-import org.example.project.pages.ChatList
-import org.example.project.pages.MessagePage
-import org.example.project.pages.NewLogin
 import org.example.project.viewmodels.AppSetting
 
 class UserSession() {
@@ -12,12 +8,13 @@ class UserSession() {
     companion object {
         private  const val KEY_USERNAME = "user_username"
         private const val KEY_PASSWORD = "user_password"
+        private const val KEY_USER_ID = "user_id"
         private const val KEY_LOGGED_IN = "user_logged_in"
     }
 
-    fun getStartDestination(): Destination {
-        if (isLoggedIn()) return ChatList
-        return NewLogin
+
+    fun getUserId(): Int {
+        return settings.getInt(KEY_USER_ID, defaultValue = 0)
     }
     fun getUsername(): String {
         return settings.getString(KEY_USERNAME, defaultValue = "")
@@ -25,9 +22,10 @@ class UserSession() {
     fun getPassword(): String {
         return settings.getString(KEY_PASSWORD, defaultValue = "")
     }
-    fun saveUserSession(username: String, password: String) {
+    fun saveUserSession(username: String, password: String, userID: Int) {
         settings.putString(KEY_USERNAME, username)
         settings.putString(KEY_PASSWORD, password)
+        settings.putInt(KEY_USER_ID, userID)
         settings.putBoolean(KEY_LOGGED_IN, true)
     }
     fun isLoggedIn(): Boolean {
@@ -37,6 +35,7 @@ class UserSession() {
     fun clearUserSession() {
         settings.remove(KEY_USERNAME)
         settings.remove(KEY_PASSWORD)
+        settings.remove(KEY_USER_ID)
         settings.putBoolean(KEY_LOGGED_IN, false)
     }
 

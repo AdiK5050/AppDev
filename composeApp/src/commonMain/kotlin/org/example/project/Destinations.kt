@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.example.project.pages.ChatList
 import org.example.project.pages.Contacts
+import org.example.project.pages.ContactsPage
 import org.example.project.pages.MessagePage
 import org.example.project.pages.NewLogin
 import org.example.project.pages.NewMessagePage
@@ -18,24 +19,24 @@ import org.example.project.pages.NewProfilePage
 import org.example.project.pages.NewSignup
 import org.example.project.storage.AppDatabase
 import org.example.project.storage.UserSession
-import org.example.project.viewmodels.ChatListViewModel
 import org.example.project.viewmodels.MessageViewModel
 import org.example.project.viewmodels.SharedViewModel
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 interface Destination
-class Destinations(val appDatabase: AppDatabase)  {
+class Destinations(val appDatabase: AppDatabase,val sharedViewModel: SharedViewModel)  {
 
     val userSession = UserSession()
-    val sharedViewModel = SharedViewModel(userSession, appDatabase)
-    val messageViewModel = MessageViewModel(appDatabase,userSession)
 
-    val chatListViewModel = ChatListViewModel(appDatabase, userSession, sharedViewModel)
+    val messageViewModel = MessageViewModel(appDatabase,userSession,sharedViewModel)
 
+    fun getStartDestination(): Destination {
+        if (userSession.isLoggedIn()) return ChatList
+        return NewLogin
+    }
     @Composable
     fun CreateDestination() {
 
-        var startDestination: Destination by remember {mutableStateOf(userSession.getStartDestination())}
+        var startDestination: Destination by remember {mutableStateOf(getStartDestination())}
 
         val navController = rememberNavController()
         NavHost(
@@ -58,9 +59,10 @@ class Destinations(val appDatabase: AppDatabase)  {
                 NewLogin(
                     userSession,
                     appDatabase,
-                    onNavigateToMessages = {
+                    sharedViewModel,
+                    onNavigateToChatList = {
                         navController.navigate(
-                            route = MessagePage
+                            route = ChatList
                         )
                     }
                 ) {
@@ -71,7 +73,9 @@ class Destinations(val appDatabase: AppDatabase)  {
             }
             composable<ChatList> { backStackEntry ->
                 ChatList(
-                    chatListViewModel,
+                    appDatabase,
+                    sharedViewModel,
+                    userSession,
                     onNavigateToMessage = {
                         navController.navigate(
                             route = MessagePage
@@ -82,31 +86,62 @@ class Destinations(val appDatabase: AppDatabase)  {
                             route = NewLogin
                         )
                     },
+                    onNavigateToChatList = {
+                        navController.navigate(
+                            route = ChatList
+                        )
+                    },
                     onNavigateToContacts = {
                         navController.navigate(
                             route = Contacts
                         )
+                    },
+                    onNavigateToProfile = {
+                        navController.navigate(
+                            route = NewProfilePage
+                        )
                     }
                 )
             }
+            composable<Contacts> { backStackEntry ->
+                ContactsPage(
+                    appDatabase,
+                    sharedViewModel,
+                    onNavigateToChatList = {
+                        navController.navigate(
+                            route = ChatList
+                        )
+                    },
+                    onNavigateToMessage = {
+                        navController.navigate(
+                            route = MessagePage
+                        )
+                    }
+                )
+            }
+
             composable<MessagePage> { backStackEntry ->
                 NewMessagePage(
+                    appDatabase,
+                    userSession,
+                    sharedViewModel,
                     messageViewModel,
                     onNavigateToProfile = {
                         navController.navigate(
                             route = NewProfilePage
                         )
                     },
-                    onNavigateToLogin = {
+                    onNavigateToChatList = {
                         navController.navigate(
-                            route = NewLogin
+                            route = ChatList
                         )
-                    },
+                    }
                 )
             }
             composable<NewProfilePage> { backStackEntry ->
                 NewProfilePage(
                     appDatabase,
+                    sharedViewModel,
                     onNavigateToMessages = {
                         navController.navigate(
                             route = MessagePage

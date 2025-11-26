@@ -51,6 +51,7 @@ import org.example.project.Destination
 import org.example.project.storage.AppDatabase
 import org.example.project.storage.UserSession
 import org.example.project.viewmodels.LoginViewModel
+import org.example.project.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.painterResource
 
 @Serializable
@@ -61,8 +62,9 @@ object NewLogin : Destination
 fun NewLogin(
     userSession: UserSession,
     appDatabase: AppDatabase,
-    loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, appDatabase.getUserDao()) },
-    onNavigateToMessages: () -> Unit,
+    sharedViewModel: SharedViewModel,
+    loginViewModel: LoginViewModel = viewModel { LoginViewModel(userSession, sharedViewModel,appDatabase.getUserDao()) },
+    onNavigateToChatList: () -> Unit,
     onNavigateToSignup: () -> Unit
 ) {
     var navigateToSignup by remember { mutableStateOf(false) }
@@ -147,7 +149,7 @@ fun NewLogin(
                     onClick = { loginViewModel.login() }
                 ) {
                     Text("Log-In", color = Color.White, fontWeight = FontWeight.Bold)
-                    if(loginViewModel.loginSuccess.value) { onNavigateToMessages() }
+                    if(loginViewModel.loginSuccess.value) { onNavigateToChatList() }
                 }
 
                 Spacer(Modifier.size(5.dp))
