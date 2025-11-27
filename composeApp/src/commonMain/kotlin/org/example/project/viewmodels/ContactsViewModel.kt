@@ -35,14 +35,15 @@ class ContactsViewModel( appDatabase: AppDatabase, private val sharedViewModel: 
                 channelDao.insertChannel(
                     ChannelEntity(
                         channelName = channelName,
-                        userCreatedID = sharedViewModel.LOGGED_IN_USER_ID.intValue
+                        userCreatedID = sharedViewModel.LOGGED_IN_USER_ID.intValue,
+                        numberOfMembers = _channelMemberIDs.size
                     )
                 )
                 val channelID = channelDao.getChannelIDByCandidateKey(
                     channelName,
                     sharedViewModel.LOGGED_IN_USER_ID.intValue
                 )
-                sharedViewModel.currentChannelID = channelID
+                sharedViewModel.currentChannelID.intValue = channelID
                 _loading.value = false
                 for (member in _channelMemberIDs) {
                     channelDao.insertChannelMember(
@@ -53,7 +54,6 @@ class ContactsViewModel( appDatabase: AppDatabase, private val sharedViewModel: 
                     )
                 }
             }
-
         }
     }
     fun showCreateButton() {

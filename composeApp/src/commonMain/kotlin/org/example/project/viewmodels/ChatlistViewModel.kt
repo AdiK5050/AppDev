@@ -24,26 +24,23 @@ class ChatListViewModel(appDatabase: AppDatabase,
     : ViewModel() {
     var _loading = mutableStateOf(false)
     val loading = _loading.value
-
-    var profilePic: MutableState<ByteArray?> = mutableStateOf(null)
     val userDao = appDatabase.getUserDao()
-    val messageDao = appDatabase.getMessageDao()
     val channelDao = appDatabase.getChannelDao()
 
+    var profilePic: MutableState<ByteArray?> = mutableStateOf(ByteArray(0))
+
+    fun initAll() {
+        viewModelScope.launch {
+            profilePic.value = userDao.getPicByUID(sharedViewModel.LOGGED_IN_USER_ID.intValue)
+        }
+    }
     val channelInfo = channelDao.getChannelInfoByMemberID(sharedViewModel.LOGGED_IN_USER_ID.intValue).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(1000),
         initialValue = emptyList()
     )
-
-    init {
-        viewModelScope.launch {
-            profilePic.value = userDao.getPicByUID(sharedViewModel.LOGGED_IN_USER_ID.intValue)
-        }
-    }
-
     fun setCurrentChannel(channelID: Int) {
-        sharedViewModel.currentChannelID = channelID
+        sharedViewModel.currentChannelID.intValue = channelID
     }
     fun clearUserSession() {
         userSession.clearUserSession()

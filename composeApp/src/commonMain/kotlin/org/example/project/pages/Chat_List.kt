@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,7 +75,9 @@ fun ChatList(
     onNavigateToProfile: () -> Unit,
     onNavigateToLogin: () -> Unit,
     ) {
-
+    LaunchedEffect(Unit) {
+        chatListViewModel.initAll()
+    }
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -90,10 +93,10 @@ fun ChatList(
         },
         bottomBar =  {
             BottomBar(
-                image = chatListViewModel.profilePic.value,
+                chatListViewModel,
                 onClickHome = { onNavigateToChatList() },
                 onClickNotifications = { /*TODO*/ },
-                onClickProfile = { onNavigateToProfile },
+                onClickProfile = { onNavigateToProfile() },
             )
         },
         floatingActionButton = {
@@ -321,13 +324,11 @@ fun ActivityCard(
 
 @Composable
 fun BottomBar(
-    image: ByteArray?,
+    chatListViewModel: ChatListViewModel,
     onClickHome: () -> Unit,
     onClickNotifications: () -> Unit,
     onClickProfile: () -> Unit,
 ) {
-        var image: ByteArray? by remember {mutableStateOf(image)}
-        if(image == null || image.contentEquals(ByteArray(0))) image = imageResource(Res.drawable.download).toByteArray()
        Row(
            modifier = Modifier
                .background(Color.Black)
@@ -395,7 +396,10 @@ fun BottomBar(
 
                ) {
                    Image(
-                       bitmap = image!!.toImageBitmap(),
+                       bitmap = if(chatListViewModel.profilePic.value.contentEquals(ByteArray(0)) || chatListViewModel.profilePic.value == null)
+                           imageResource(Res.drawable.download)
+                                else
+                                    chatListViewModel.profilePic.value!!.toImageBitmap(),
                        contentDescription = "Profile Picture",
                        modifier = Modifier
                            .size(20.dp)

@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,12 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -61,7 +57,7 @@ import org.example.project.Destination
 import org.example.project.storage.AppDatabase
 import org.example.project.storage.MessageEntity
 import org.example.project.storage.UserSession
-import org.example.project.toByteArray
+import org.example.project.viewmodels.ChannelMembersInfo
 import org.example.project.viewmodels.MessageViewModel
 import org.example.project.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.imageResource
@@ -81,10 +77,9 @@ fun NewMessagePage(
     onNavigateToProfile: () -> Unit,
     onNavigateToChatList: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        messageViewModel.initAll()
-    }
     val messageHistory by messageViewModel.messageHistory.collectAsStateWithLifecycle()
+    val channelMembers by messageViewModel.channelMembers.collectAsStateWithLifecycle()
+    val channel by messageViewModel.channel.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier
@@ -95,7 +90,7 @@ fun NewMessagePage(
         topBar = {
             TopAppBar(
                 modifier = Modifier.background(color = Color.Black),
-                title = { Text(messageViewModel.channelName.value) },
+                title = { Text(channel.channelName)},
                 navigationIcon = @Composable {
                     IconButton(
                         onClick = {
@@ -122,6 +117,7 @@ fun NewMessagePage(
                 modifier = Modifier.padding(padding),
                 messageViewModel,
                 messageHistory,
+                channelMembers,
                 onNavigateToProfile,
             )
         }
@@ -133,6 +129,7 @@ fun MessageContent(
     modifier: Modifier,
     messageViewModel: MessageViewModel,
     messageHistory: List<MessageEntity>,
+    channelMembers: List<ChannelMembersInfo>,
     onNavigateToProfile: () -> Unit,
 ) {
     var profileClicked by remember { mutableStateOf(false) }
@@ -165,16 +162,14 @@ fun MessageContent(
                 .weight(1f)
         ) {
             items(messageHistory) { messageEntity ->
-                val userEntity = messageViewModel.channelMembers.first(
-                    { it.userID == messageEntity.senderID }
-                )
+                var userEntity: ChannelMembersInfo? by remember { mutableStateOf(ChannelMembersInfo(messageEntity.senderID,"", ByteArray(0)))}
+                userEntity = channelMembers.firstOrNull { it.userID == messageEntity.senderID }
                 NewMessageCard(
                     messageEntity.message,
-                    userEntity.username,
-                    userEntity.profilePic,
+                    userEntity,
                     {
                         profileClicked = !profileClicked
-                        messageViewModel.setCurrentUserID(userEntity.userID)
+                        messageViewModel.setCurrentUserID(messageEntity.senderID)
                     },
                     { onNavigateToProfile() }
                 )
@@ -216,12 +211,10 @@ fun MessageContent(
 @Composable
 fun NewMessageCard(
     message: String,
-    username: String,
-    profilePic: ByteArray?,
+    user: ChannelMembersInfo?,
     onProfileClick: () -> Unit,
     onNavigateToProfile: () -> Unit
 ) {
-    var profilePic by remember { mutableStateOf(profilePic) }
     var horizontalArrangement by remember { mutableStateOf(Arrangement.Start)}
     Row(
         modifier = Modifier
@@ -229,10 +222,20 @@ fun NewMessageCard(
             .fillMaxWidth(),
         horizontalArrangement = horizontalArrangement,
     ){
-        if( profilePic == null) {
-            profilePic = imageResource(Res.drawable.download).toByteArray()
-        }
-        ImageVisibility(onProfileClick, profilePic!!, onNavigateToProfile)
+        Image(
+            bitmap = if(user?.profilePic == null || user.profilePic.contentEquals(ByteArray(0)))
+                imageResource(Res.drawable.download)
+            else
+                user.profilePic.toImageBitmap(),
+            contentDescription = "A photo of a beauty.",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .clickable(enabled = true, onClick = {
+                    onProfileClick()
+                    onNavigateToProfile()
+                })
+        )
         var isExpanded by remember { mutableStateOf(false)}
         val surfaceColor by animateColorAsState(
             if(isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
@@ -242,7 +245,8 @@ fun NewMessageCard(
                 .clickable {isExpanded = !isExpanded },
         ) {
             Text(
-                username,
+                if(user?.username?.isNotBlank() == true) user.username else "User",
+                modifier = Modifier.padding(all = 4.dp),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -262,36 +266,5 @@ fun NewMessageCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun ImageVisibility(
-    onProfileClick: () -> Unit,
-    profilePic: ByteArray?,
-    onNavigateToProfile: () -> Unit
-) {
-    Image(
-        bitmap = if(profilePic == null || profilePic.contentEquals(ByteArray(0)))
-                    imageResource(Res.drawable.download)
-                else
-                    profilePic.toImageBitmap(),
-        contentDescription = "A photo of a beauty.",
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable(enabled = true, onClick = {
-                onProfileClick()
-                onNavigateToProfile()
-            })
-    )
-}
-@Composable
-fun LoadingScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }

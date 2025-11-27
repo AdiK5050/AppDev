@@ -72,7 +72,6 @@ fun ContactsPage(
             .background(color = Color(0xff0D1114))
             .safeContentPadding()
     ) {
-        if(contactsViewModel.loading) LoadingScreen()
         Column {
             Header(
                 searchFieldValue.text,

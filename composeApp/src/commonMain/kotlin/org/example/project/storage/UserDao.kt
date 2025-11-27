@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy.Companion.ABORT
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import org.example.project.viewmodels.ChannelInfo
+import org.example.project.viewmodels.ChannelMembersInfo
 
 @Dao
 interface UserDao {
@@ -58,11 +59,11 @@ interface ChannelDao {
 
     fun getChannelInfoByMemberID(memberID: Int): Flow<List<ChannelInfo>>
 
-    @Query("SELECT channelName FROM ChannelEntity WHERE channelID = :channelID")
-    suspend fun getChannelNameByChannelID(channelID: Int): String
+    @Query("SELECT * FROM ChannelEntity WHERE channelID = :channelID")
+    fun getChannelByChannelID(channelID: Int): Flow<ChannelEntity>
 
-    @Query("SELECT memberID FROM ChannelMembers WHERE channelID = :channelID")
-    suspend fun getMembersByChannelID(channelID: Int): List<Int>
+    @Query("SELECT UE.userID,UE.username,UE.profilePic FROM UserEntity UE JOIN ChannelMembers CM ON UE.userID = CM.memberID WHERE CM.channelID = :channelID")
+    fun getMembersByChannelID(channelID: Int): Flow<List<ChannelMembersInfo>>
 
     @Query("SELECT channelID FROM ChannelMembers WHERE memberID = :memberID")
     suspend fun getChannelsByMemberID(memberID: Int): List<Int>

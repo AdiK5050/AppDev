@@ -16,7 +16,7 @@ import org.example.project.toByteArray
 class ProfileViewModel(val appDatabase: AppDatabase, sharedViewModel: SharedViewModel) : ViewModel() {
 
     val userDao = appDatabase.getUserDao()
-    val userID = mutableIntStateOf(sharedViewModel.currentUserID)
+    val userID = mutableIntStateOf(sharedViewModel.currentUserID.intValue)
     val user: MutableState<UserEntity> = mutableStateOf(UserEntity(userID.intValue,"",""))
     var image = mutableStateOf<ImageData?>(null)
     var profilePic: MutableState<ByteArray?> = mutableStateOf(ByteArray(0))
@@ -31,9 +31,9 @@ class ProfileViewModel(val appDatabase: AppDatabase, sharedViewModel: SharedView
             user.value = userDao.getUserByUserID(userID.intValue)
             name.value = user.value.username
             profilePic.value = user.value.profilePic
+            println("UserName: ${name.value}")
+            println("profilePic value: ${profilePic.value}")
         }
-        println("UserName: ${name.value}")
-        println("profilePic value: ${profilePic.value}")
     }
     fun chooseImage() = viewModelScope.launch {
         image.value = selectImage()

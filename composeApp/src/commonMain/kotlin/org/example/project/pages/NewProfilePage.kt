@@ -105,10 +105,9 @@ fun NewProfilePage(
                         .size(100.dp),
                 )
                 Text(
-                    "Name:${profileViewModel.name.value}\nContact:      ",
+                    "Name:${profileViewModel.name.value}\nContact:${profileViewModel.userID.intValue}",
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
-
             }
             Button(
                 onClick = {

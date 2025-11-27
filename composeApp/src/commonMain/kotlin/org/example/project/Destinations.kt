@@ -25,6 +25,7 @@ import org.example.project.viewmodels.SharedViewModel
 interface Destination
 class Destinations(val appDatabase: AppDatabase,val sharedViewModel: SharedViewModel)  {
 
+
     val userSession = UserSession()
 
     val messageViewModel = MessageViewModel(appDatabase,userSession,sharedViewModel)

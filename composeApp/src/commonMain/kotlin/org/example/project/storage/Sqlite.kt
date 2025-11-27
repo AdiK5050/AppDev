@@ -11,7 +11,7 @@ import androidx.room.RoomDatabaseConstructor
         ChannelEntity::class,
         ChannelMembers::class,
                ],
-    version = 8)
+    version = 9)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getUserDao(): UserDao

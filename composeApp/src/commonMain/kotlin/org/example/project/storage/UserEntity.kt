@@ -76,6 +76,7 @@ data class ChannelEntity(
     @PrimaryKey(autoGenerate = true) val channelID: Int = 0,
     val channelName: String,
     val userCreatedID: Int,
+    val numberOfMembers: Int,
 )
 
 @Entity(

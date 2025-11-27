@@ -1,21 +1,27 @@
 package org.example.project
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wannaverse.imageselector.registerImageSelectorLauncher
 import com.wannaverse.imageselector.setImageSelectorActivity
@@ -56,6 +62,7 @@ class MainActivity : ComponentActivity() {
                         val appDatabase = getDatabaseBuilder(this@MainActivity)
                         val userSession = UserSession()
                         val sharedViewModel = viewModel { SharedViewModel(userSession) }
+                        FullScreenLoader(sharedViewModel)
                         val destinations = Destinations(appDatabase,sharedViewModel)
                         destinations.CreateDestination()
                     }
@@ -64,23 +71,31 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-@Preview(name = "Light Mode", showBackground = false,
-    uiMode = Configuration.UI_MODE_TYPE_NORMAL
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-    )
 @Composable
-fun AppAndroidPreview() {
-    MaterialTheme(
-        colorScheme = darkColorScheme(),
-    ) {
-        Surface(modifier = Modifier,
-            color = MaterialTheme.colorScheme.secondaryContainer
+fun FullScreenLoader(
+    sharedViewModel: SharedViewModel,
+    bgColor: Color = Color(0x88000000)
+) {
+
+    if (sharedViewModel.isLoading.value) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            )
         ) {
-            Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(bgColor),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 8.dp,
+                    color = Color.Blue
+                )
             }
         }
     }
