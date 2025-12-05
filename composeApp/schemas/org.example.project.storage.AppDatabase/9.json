@@ -1,0 +1,217 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 9,
+    "identityHash": "062befcd78f2d705f609df2153d48ac6",
+    "entities": [
+      {
+        "tableName": "UserEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT NOT NULL, `password` TEXT NOT NULL, `profilePic` BLOB)",
+        "fields": [
+          {
+            "fieldPath": "userID",
+            "columnName": "userID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "password",
+            "columnName": "password",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profilePic",
+            "columnName": "profilePic",
+            "affinity": "BLOB"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "userID"
+          ]
+        }
+      },
+      {
+        "tableName": "MessageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `senderID` INTEGER NOT NULL, `channelID` INTEGER NOT NULL, `message` TEXT NOT NULL, `timeInMillis` INTEGER NOT NULL, FOREIGN KEY(`senderID`) REFERENCES `UserEntity`(`userID`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`channelID`) REFERENCES `ChannelEntity`(`channelID`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderID",
+            "columnName": "senderID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelID",
+            "columnName": "channelID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeInMillis",
+            "columnName": "timeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "messageId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "UserEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "senderID"
+            ],
+            "referencedColumns": [
+              "userID"
+            ]
+          },
+          {
+            "table": "ChannelEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "channelID"
+            ],
+            "referencedColumns": [
+              "channelID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ChannelEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelName` TEXT NOT NULL, `userCreatedID` INTEGER NOT NULL, `numberOfMembers` INTEGER NOT NULL, FOREIGN KEY(`userCreatedID`) REFERENCES `UserEntity`(`userID`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelID",
+            "columnName": "channelID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelName",
+            "columnName": "channelName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userCreatedID",
+            "columnName": "userCreatedID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numberOfMembers",
+            "columnName": "numberOfMembers",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "channelID"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "UserEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "userCreatedID"
+            ],
+            "referencedColumns": [
+              "userID"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ChannelMembers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channelMembersID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `channelID` INTEGER NOT NULL, `memberID` INTEGER NOT NULL, FOREIGN KEY(`memberID`) REFERENCES `UserEntity`(`userID`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`channelID`) REFERENCES `ChannelEntity`(`channelID`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelMembersID",
+            "columnName": "channelMembersID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelID",
+            "columnName": "channelID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberID",
+            "columnName": "memberID",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "channelMembersID"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "UserEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "memberID"
+            ],
+            "referencedColumns": [
+              "userID"
+            ]
+          },
+          {
+            "table": "ChannelEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "channelID"
+            ],
+            "referencedColumns": [
+              "channelID"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '062befcd78f2d705f609df2153d48ac6')"
+    ]
+  }
+}

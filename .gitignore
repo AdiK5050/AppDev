@@ -18,3 +18,5 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 composeApp/src/commonMain/kotlin/org/example/project/Junk
+composeApp/my_room.db
+composeApp/my_room.db.lck

@@ -2,16 +2,14 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-
-
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
     kotlin("plugin.serialization") version "2.0.21"
-
 }
 
 kotlin {
@@ -37,6 +35,8 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation("com.wannaverse:imageselector-android:")
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -56,6 +56,12 @@ kotlin {
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.settings.coroutines)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.kotlinx.datetime)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.lifecycle.viewmodel)
         }
         jvmMain.dependencies {
             implementation("com.wannaverse:imageselector-jvm:")
@@ -96,6 +102,9 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    add("kspAndroid", libs.androidx.room.compiler)
+//    add("kspCommonMainMetadata", project(":your-ksp-processor-module")) // For common code processing
+    add("kspJvm", libs.androidx.room.compiler)
 }
 compose.desktop{
     application {
@@ -106,5 +115,8 @@ compose.desktop{
             packageVersion = "1.0.0"
         }
     }
+}
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
