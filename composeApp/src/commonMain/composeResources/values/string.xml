@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Discord</string>
+    <string name = "discord_nitro">Nitro</string>
+    <string name = "user_thoughts">What did you eat today?</string>
+    <string name = "edit_profile">Edit Profile</string>
+    <string name = "orbs_balance">Orbs Balance</string>
+    <string name = "orbs">Orbs</string>
+    <string name = "about_me">About Me</string>
+    <string name= "member_since">Member Since</string>
+    <string name= "connections">Connections</string>
+    <string name= "friends">Friends</string>
+    <string name = "bottom_navigation_home">Home</string>
+    <string name = "bottom_navigation_notifications">Notifications</string>
+    <string name = "bottom_navigation_profile">You</string>
+</resources>

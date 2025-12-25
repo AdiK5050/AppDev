@@ -44,6 +44,7 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -242,7 +243,8 @@ fun NewMessageCard(
                 .clickable(enabled = true, onClick = {
                     onProfileClick()
                     onNavigateToProfile()
-                })
+                }),
+            contentScale = ContentScale.Crop
         )
         var isExpanded by remember { mutableStateOf(false)}
         val surfaceColor by animateColorAsState(

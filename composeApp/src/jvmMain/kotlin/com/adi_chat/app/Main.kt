@@ -22,14 +22,15 @@ import androidx.compose.ui.window.application
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.adi_chat.app.storage.UserSession
 import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.ui.theme.AppTheme
 
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "KotlinProjectDesktop",
     ) {
-        MaterialTheme(
-            colorScheme = darkColorScheme(),
+        AppTheme(
+            darkTheme = true,
         ) {
             Surface(modifier = Modifier
                 .fillMaxSize()

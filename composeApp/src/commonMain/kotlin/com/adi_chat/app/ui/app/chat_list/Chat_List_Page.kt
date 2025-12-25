@@ -46,9 +46,8 @@ import kotlinproject.composeapp.generated.resources.do_not_disturb_on_24dp_e3e3e
 import kotlinproject.composeapp.generated.resources.download
 import kotlinproject.composeapp.generated.resources.home_work_24dp_e3e3e3
 import kotlinproject.composeapp.generated.resources.logout_24dp_e3e3e3_fill0_wght400_grad0_opsz24
-import kotlinproject.composeapp.generated.resources.notifications_24dp_e3e3e3
 import kotlinproject.composeapp.generated.resources.person_add_24dp_e3e3e3_fill0_wght400_grad0_opsz24
-import kotlinproject.composeapp.generated.resources.search_24dp_e3e3e3_fill0_wght400_grad0_opsz24
+import kotlinproject.composeapp.generated.resources.search
 import kotlinx.serialization.Serializable
 import com.adi_chat.app.Destination
 import com.adi_chat.app.storage.AppDatabase
@@ -56,6 +55,7 @@ import com.adi_chat.app.storage.UserSession
 import com.adi_chat.app.toByteArray
 import com.adi_chat.app.ui.app.chat_list.viewmodels.ChatListViewModel
 import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import kotlinproject.composeapp.generated.resources.discord_notifications
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -176,7 +176,7 @@ fun TopBar(
                 onClick = {onSearch()}
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.search_24dp_e3e3e3_fill0_wght400_grad0_opsz24),
+                    painter = painterResource(Res.drawable.search),
                     contentDescription = "Search",
                     tint = Color.White,
                     modifier = Modifier
@@ -369,7 +369,7 @@ fun BottomBar(
            ) {
                Column {
                    Icon(
-                       painter = painterResource(Res.drawable.notifications_24dp_e3e3e3),
+                       painter = painterResource(Res.drawable.discord_notifications),
                        contentDescription = "Add Friend",
                        tint = Color.White,
                        modifier = Modifier
@@ -392,9 +392,7 @@ fun BottomBar(
                    ),
                contentAlignment = Alignment.Center
            ) {
-               Column(
-
-               ) {
+               Column{
                    Image(
                        bitmap = if(chatListViewModel.profilePic.value.contentEquals(ByteArray(0)) || chatListViewModel.profilePic.value == null)
                            imageResource(Res.drawable.download)

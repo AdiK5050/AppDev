@@ -1,4 +1,4 @@
-package org.example.project
+package com.adi_chat.app
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
