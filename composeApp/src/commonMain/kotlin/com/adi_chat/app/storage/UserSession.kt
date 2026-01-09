@@ -1,6 +1,6 @@
 package com.adi_chat.app.storage
 
-import com.adi_chat.app.shared_viewmodels.AppSetting
+import com.adi_chat.app.shared.viewmodels.AppSetting
 
 class UserSession() {
     private val settings = AppSetting.settings

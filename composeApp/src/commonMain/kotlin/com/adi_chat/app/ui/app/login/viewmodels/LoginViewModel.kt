@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adi_chat.app.storage.UserDao
 import com.adi_chat.app.storage.UserSession
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 import kotlinx.coroutines.launch
 
 class LoginViewModel(

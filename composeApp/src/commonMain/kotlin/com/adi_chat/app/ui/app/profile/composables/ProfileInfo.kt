@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.adi_chat.app.shared.composables.Image_With_Status
 import com.adi_chat.app.ui.theme.AppTheme
+import io.adik5050.discord_like.shared.composables.OnlineStatus
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.add_circle_24dp_e3e3e3
 import kotlinproject.composeapp.generated.resources.direct_down
@@ -50,7 +51,7 @@ fun ProfileInfo(
     image: ByteArray?,
     clickableImage: Boolean,
     onClickImage: () -> Unit,
-    status: String,
+    status: OnlineStatus,
     onEdit: () -> Unit,
     thoughts: String? = null,
     onClickNotes: () -> Unit = {}
@@ -83,7 +84,7 @@ fun ProfileInfo(
 fun ProfileInfoImageRow(
     modifier: Modifier = Modifier,
     image: ByteArray? = null,
-    status: String = "Online",
+    status: OnlineStatus = OnlineStatus.ONLINE,
     thoughts: String?,
     clickableImage: Boolean,
     onClickImage: () -> Unit,
@@ -225,7 +226,7 @@ fun PreviewProfileInfo() {
                 userId = "adi8299",
                 pronouns = "He/Him",
                 image = null,
-                status = "Do_Not_Disturb",
+                status = OnlineStatus.DO_NOT_DISTURB,
                 clickableImage = false,
                 onClickImage = {},
                 onEdit = {},

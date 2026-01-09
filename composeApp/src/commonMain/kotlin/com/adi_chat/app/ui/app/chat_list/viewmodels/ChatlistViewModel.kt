@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.storage.UserSession
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch

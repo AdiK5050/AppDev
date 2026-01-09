@@ -17,28 +17,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.wannaverse.imageselector.toImageBitmap
+import io.adik5050.discord_like.shared.composables.OnlineStatus
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.discord
-import kotlinproject.composeapp.generated.resources.download
-import kotlinproject.composeapp.generated.resources.riasgremory
 import kotlinproject.composeapp.generated.resources.status_do_not_disturb
-import kotlinproject.composeapp.generated.resources.status_offline
 import kotlinproject.composeapp.generated.resources.status_online
-import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun Image_With_Status( modifier: Modifier = Modifier,
-                       image: ByteArray?,
-                       status: String,
-                       clickable: Boolean,
-                       onClick: () -> Unit
+fun Image_With_Status(modifier: Modifier = Modifier,
+                      image: ByteArray?,
+                      status: OnlineStatus = OnlineStatus.NONE,
+                      clickable: Boolean = false,
+                      onClick: () -> Unit = {}
 ) {
     Box (
         modifier = modifier
@@ -73,25 +68,31 @@ fun Image_With_Status( modifier: Modifier = Modifier,
                 .background(color = MaterialTheme.colorScheme.background,shape = CircleShape)
         ) {
             when (status) {
-                "Do_Not_Disturb" -> Icon(
+                OnlineStatus.DO_NOT_DISTURB -> Icon(
                     painterResource(Res.drawable.status_do_not_disturb),
                     contentDescription = "Do Nod Disturb",
-                    tint = Color(0xfff02d2d)
+                    tint = Color(0xfff02d2d),
+                    modifier = Modifier.align(alignment = Alignment.Center)
                 )
-                "Online" -> Icon(
+                OnlineStatus.ONLINE -> Icon(
                     painterResource(Res.drawable.status_online),
                     contentDescription = "Online",
-                    tint = Color(0xff00c230)
+                    tint = Color(0xff00c230),
+                    modifier = Modifier.align(alignment = Alignment.Center)
                 )
-                "Invisible" -> Icon(
+                OnlineStatus.INVISIBLE -> Icon(
                     painterResource(Res.drawable.status_online),
                     contentDescription = "Online",
-                    tint = Color.Gray
+                    tint = Color.Gray,
+                    modifier = Modifier.align(alignment = Alignment.Center)
                 )
+                else -> {}
             }
         }
     }
 }
+
+
 
 @Preview
 @Composable
@@ -99,9 +100,9 @@ fun Preview_Image_With_Status() {
     MaterialTheme(darkColorScheme()) {
         Surface {
             Column {
-                Image_With_Status(Modifier.size(70.dp), null, "Online", false, {})
-                Image_With_Status(Modifier.size(70.dp), null,"Do_Not_Disturb", false, {})
-                Image_With_Status(Modifier.size(70.dp), null, "Invisible", false, {})
+                Image_With_Status(Modifier.size(70.dp), null, OnlineStatus.ONLINE, false, {})
+                Image_With_Status(Modifier.size(70.dp), null, OnlineStatus.DO_NOT_DISTURB, false, {})
+                Image_With_Status(Modifier.size(70.dp), null, OnlineStatus.INVISIBLE, false, {})
             }
         }
     }

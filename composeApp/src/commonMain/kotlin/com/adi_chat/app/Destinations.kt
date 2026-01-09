@@ -20,7 +20,7 @@ import com.adi_chat.app.ui.app.signup.NewSignup
 import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.storage.UserSession
 import com.adi_chat.app.ui.app.chat.viewmodels.MessageViewModel
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 
 interface Destination
 class Destinations(val appDatabase: AppDatabase,val sharedViewModel: SharedViewModel)  {

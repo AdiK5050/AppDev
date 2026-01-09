@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.storage.UserEntity
 import com.adi_chat.app.toByteArray
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 import com.wannaverse.imageselector.ImageData
 import com.wannaverse.imageselector.selectImage
 import com.wannaverse.imageselector.toImageBitmap

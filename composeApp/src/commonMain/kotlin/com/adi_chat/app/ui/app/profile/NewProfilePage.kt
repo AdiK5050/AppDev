@@ -44,7 +44,7 @@ import kotlinx.serialization.Serializable
 import com.adi_chat.app.Destination
 import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.ui.app.profile.viewmodels.ProfileViewModel
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 

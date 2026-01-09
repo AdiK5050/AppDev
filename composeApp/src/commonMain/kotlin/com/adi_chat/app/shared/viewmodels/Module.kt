@@ -1,4 +1,4 @@
-package com.adi_chat.app.shared_viewmodels
+package com.adi_chat.app.shared.viewmodels
 
 import com.russhwolf.settings.Settings
 import kotlinx.serialization.Serializable

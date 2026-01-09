@@ -51,7 +51,7 @@ import com.adi_chat.app.Destination
 import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.storage.UserSession
 import com.adi_chat.app.ui.app.login.viewmodels.LoginViewModel
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 import org.jetbrains.compose.resources.painterResource
 
 @Serializable

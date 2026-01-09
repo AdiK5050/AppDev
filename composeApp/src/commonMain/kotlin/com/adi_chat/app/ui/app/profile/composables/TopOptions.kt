@@ -43,7 +43,7 @@ fun TopOptions(
     ) {
         Row (
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             IconButton(
                 modifier = Modifier.size(40.dp),

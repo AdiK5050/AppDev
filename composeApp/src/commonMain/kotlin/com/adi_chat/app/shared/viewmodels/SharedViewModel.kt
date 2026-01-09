@@ -1,4 +1,4 @@
-package com.adi_chat.app.shared_viewmodels
+package com.adi_chat.app.shared.viewmodels
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf

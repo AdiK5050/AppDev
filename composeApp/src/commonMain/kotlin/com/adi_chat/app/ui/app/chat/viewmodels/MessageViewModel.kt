@@ -13,7 +13,7 @@ import com.adi_chat.app.storage.AppDatabase
 import com.adi_chat.app.storage.ChannelEntity
 import com.adi_chat.app.storage.MessageEntity
 import com.adi_chat.app.storage.UserSession
-import com.adi_chat.app.shared_viewmodels.SharedViewModel
+import com.adi_chat.app.shared.viewmodels.SharedViewModel
 
 data class ChannelMembersInfo(
     val userID: Int,

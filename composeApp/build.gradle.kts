@@ -36,7 +36,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("com.wannaverse:imageselector-android:")
+            implementation(libs.imageselector)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
         }
@@ -64,9 +64,11 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.lifecycle.viewmodel)
+            implementation(libs.androidx.navigation3.ui)
+            implementation(libs.androidx.navigation3.material3.adaptive)
         }
         jvmMain.dependencies {
-            implementation("com.wannaverse:imageselector-jvm:")
+            implementation(libs.imageselector)
             implementation(compose.desktop.currentOs)
         }
         commonTest.dependencies {
@@ -105,7 +107,7 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
     add("kspAndroid", libs.androidx.room.compiler)
-//    add("kspCommonMainMetadata", project(":your-ksp-processor-module")) // For common code processing
+    add("kspCommonMainMetadata", libs.androidx.room.compiler) // For common code processing
     add("kspJvm", libs.androidx.room.compiler)
 }
 compose.desktop{

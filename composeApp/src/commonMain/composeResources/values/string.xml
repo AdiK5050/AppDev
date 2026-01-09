@@ -12,4 +12,5 @@
     <string name = "bottom_navigation_home">Home</string>
     <string name = "bottom_navigation_notifications">Notifications</string>
     <string name = "bottom_navigation_profile">You</string>
+    <string name = "search">Search</string>
 </resources>
